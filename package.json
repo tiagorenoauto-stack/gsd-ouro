@@ -1,0 +1,31 @@
+{
+  "name": "gsd-ouro",
+  "version": "0.1.0",
+  "description": "Kit Padrão Ouro — Sistema de desenvolvimento inteligente com orquestração multi-IA para Claude Code",
+  "main": "bin/install.js",
+  "bin": {
+    "gsd-ouro": "bin/install.js"
+  },
+  "scripts": {
+    "install": "node bin/install.js",
+    "dashboard": "node scripts/dashboard-server.js",
+    "test": "echo \"Testes serão implementados na v0.2\""
+  },
+  "keywords": [
+    "claude-code",
+    "ai-orchestration",
+    "prompt-engineering",
+    "development-kit",
+    "multi-ai",
+    "gsd-ouro"
+  ],
+  "author": "tiagorenoauto-stack",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tiagorenoauto-stack/gsd-ouro.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

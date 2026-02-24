@@ -1,0 +1,9 @@
+{
+  "name": "gsd-ouro",
+  "version": "0.1.0",
+  "description": "Kit Padrão Ouro — Sistema de desenvolvimento inteligente com orquestração multi-IA",
+  "author": "tiagorenoauto-stack",
+  "commands": "commands/",
+  "agents": "agents/",
+  "hooks": "hooks/"
+}

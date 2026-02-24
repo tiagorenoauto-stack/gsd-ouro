@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GSD Ouro — Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .tab-active { border-bottom: 2px solid #f59e0b; color: #f59e0b; }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const API = 'http://localhost:3333/api';
+
+    // Card component
+    function Card({ title, value, subtitle, icon }) {
+      return (
+        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <div className="text-gray-400 text-sm mb-1">{icon} {title}</div>
+          <div className="text-2xl font-bold text-amber-400">{value}</div>
+          {subtitle && <div className="text-gray-500 text-xs mt-1">{subtitle}</div>}
+        </div>
+      );
+    }
+
+    // Navigation
+    function Nav({ active, setActive }) {
+      const tabs = [
+        { id: 'overview', label: '🏠 Visão Geral' },
+        { id: 'costs', label: '💰 Economia' },
+        { id: 'ias', label: '🤖 IAs' },
+        { id: 'prompts', label: '✨ Prompts' },
+        { id: 'sessions', label: '📅 Sessões' },
+        { id: 'quality', label: '✅ Qualidade' },
+      ];
+      return (
+        <nav className="flex gap-1 border-b border-gray-800 px-4 overflow-x-auto">
+          {tabs.map(t => (
+            <button key={t.id}
+              className={`px-3 py-2 text-sm whitespace-nowrap ${active === t.id ? 'tab-active font-semibold' : 'text-gray-400 hover:text-gray-200'}`}
+              onClick={() => setActive(t.id)}>
+              {t.label}
+            </button>
+          ))}
+        </nav>
+      );
+    }
+
+    // Overview Page
+    function OverviewPage({ data }) {
+      return (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card icon="📊" title="PROGRESSO" value={`${data.progresso || 0}%`} subtitle="do projeto" />
+            <Card icon="💰" title="ECONOMIA" value={`${data.economia_pct || 0}%`} subtitle={`$${(data.custo_hipotetico - data.custo_real).toFixed(2)} salvos`} />
+            <Card icon="⚡" title="TAREFAS" value={data.tarefas_concluidas || 0} subtitle="concluídas" />
+            <Card icon="✅" title="QUALIDADE" value={`${data.conformidade || 0}%`} subtitle="conforme Kit" />
+          </div>
+          {data.alertas && data.alertas.length > 0 && (
+            <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4">
+              <h3 className="text-yellow-400 font-semibold mb-2">⚠️ Alertas</h3>
+              {data.alertas.map((a, i) => <p key={i} className="text-yellow-200 text-sm">• {a}</p>)}
+            </div>
+          )}
+          <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+            <h3 className="font-semibold mb-3">📋 Como Começar</h3>
+            <div className="text-gray-400 text-sm space-y-1">
+              <p>1. Use <code className="text-amber-400">/ouro:novo-projeto</code> para inicializar</p>
+              <p>2. Use <code className="text-amber-400">/ouro:planejar 1</code> para planejar a fase 1</p>
+              <p>3. Use <code className="text-amber-400">/ouro:executar 1</code> para executar</p>
+              <p>4. As métricas aparecerão aqui automaticamente</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Costs Page
+    function CostsPage({ data }) {
+      return (
+        <div className="space-y-6">
+          <div className="grid grid-cols-3 gap-4">
+            <Card icon="💵" title="Custo Real" value={`$${(data.custo_real || 0).toFixed(2)}`} />
+            <Card icon="📊" title="Se Só Claude" value={`$${(data.custo_hipotetico || 0).toFixed(2)}`} />
+            <Card icon="🎉" title="Economia" value={`$${((data.custo_hipotetico || 0) - (data.custo_real || 0)).toFixed(2)}`} subtitle={`${data.economia_pct || 0}%`} />
+          </div>
+          <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+            <p className="text-gray-400 text-sm">Gráficos de custo por IA e por tarefa serão exibidos aqui quando houver dados de sessões.</p>
+          </div>
+        </div>
+      );
+    }
+
+    // IAs Page
+    function IAsPage() {
+      return (
+        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <h3 className="font-semibold mb-3">🤖 Performance das IAs</h3>
+          <p className="text-gray-400 text-sm mb-4">Tabela comparativa será populada com dados reais das sessões.</p>
+          <table className="w-full text-sm">
+            <thead><tr className="text-gray-500 border-b border-gray-800">
+              <th className="text-left py-2">IA</th><th>Chamadas</th><th>Sucesso</th><th>Custo</th><th>Tier</th>
+            </tr></thead>
+            <tbody className="text-gray-300">
+              <tr className="border-b border-gray-800/50"><td className="py-2">Claude Sonnet</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">Pago</td><td className="text-center">Premium</td></tr>
+              <tr className="border-b border-gray-800/50"><td className="py-2">Codestral</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">$0</td><td className="text-center">Grátis</td></tr>
+              <tr className="border-b border-gray-800/50"><td className="py-2">Gemini Pro</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">$0</td><td className="text-center">Grátis</td></tr>
+              <tr><td className="py-2">DeepSeek V3</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">$0</td><td className="text-center">Grátis</td></tr>
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    // Prompts Page
+    function PromptsPage({ prompts }) {
+      return (
+        <div className="space-y-6">
+          <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+            <h3 className="font-semibold mb-3">✨ Gerador de Prompts</h3>
+            <p className="text-gray-400 text-sm mb-3">Use <code className="text-amber-400">/ouro:prompt "texto"</code> no terminal para gerar prompts otimizados.</p>
+            <p className="text-gray-500 text-xs">Versão web interativa será adicionada em breve.</p>
+          </div>
+          {prompts.length > 0 && (
+            <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+              <h3 className="font-semibold mb-3">📋 Histórico</h3>
+              {prompts.map((p, i) => (
+                <div key={i} className="border-b border-gray-800/50 py-2 text-sm">
+                  <span className="text-gray-500">{p.timestamp}</span>
+                  <span className="ml-2 text-gray-300">{p.input_usuario}</span>
+                  <span className="ml-2 text-amber-400">{p.resultado === 'sucesso_primeira_tentativa' ? '✅' : '⚠️'}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Sessions & Quality Pages (placeholder)
+    function SessionsPage({ sessions }) {
+      return (
+        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <h3 className="font-semibold mb-3">📅 Sessões</h3>
+          {sessions.length === 0
+            ? <p className="text-gray-400 text-sm">Nenhuma sessão registrada ainda. Use <code className="text-amber-400">/ouro:pausar</code> ao final de cada sessão.</p>
+            : sessions.map((s, i) => (
+              <div key={i} className="border-b border-gray-800/50 py-2 text-sm text-gray-300">
+                {s.timestamp} — {s.tarefas || 0} tarefas — ${(s.custo || 0).toFixed(2)}
+              </div>
+            ))
+          }
+        </div>
+      );
+    }
+
+    function QualityPage({ data }) {
+      return (
+        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <h3 className="font-semibold mb-3">✅ Qualidade e Conformidade</h3>
+          <div className="mb-4">
+            <div className="text-gray-400 text-sm mb-1">Conformidade Kit Ouro</div>
+            <div className="w-full bg-gray-800 rounded-full h-4">
+              <div className="bg-amber-500 h-4 rounded-full" style={{width: `${data.conformidade || 0}%`}}></div>
+            </div>
+            <div className="text-right text-sm text-amber-400 mt-1">{data.conformidade || 0}%</div>
+          </div>
+          <p className="text-gray-400 text-sm">Desvios e recomendações aparecerão aqui quando houver dados.</p>
+        </div>
+      );
+    }
+
+    // Main App
+    function App() {
+      const [active, setActive] = useState('overview');
+      const [dashboard, setDashboard] = useState({});
+      const [sessions, setSessions] = useState([]);
+      const [prompts, setPrompts] = useState([]);
+
+      useEffect(() => {
+        fetch(`${API}/dashboard`).then(r => r.json()).then(setDashboard).catch(() => {});
+        fetch(`${API}/sessoes`).then(r => r.json()).then(setSessions).catch(() => {});
+        fetch(`${API}/prompts`).then(r => r.json()).then(setPrompts).catch(() => {});
+      }, []);
+
+      const pages = {
+        overview: <OverviewPage data={dashboard} />,
+        costs: <CostsPage data={dashboard} />,
+        ias: <IAsPage />,
+        prompts: <PromptsPage prompts={prompts} />,
+        sessions: <SessionsPage sessions={sessions} />,
+        quality: <QualityPage data={dashboard} />,
+      };
+
+      return (
+        <div className="max-w-5xl mx-auto">
+          <header className="px-4 py-4 flex items-center gap-3 border-b border-gray-800">
+            <span className="text-2xl">🏆</span>
+            <h1 className="text-lg font-bold">GSD Ouro</h1>
+            <span className="text-gray-500 text-sm">— Dashboard</span>
+            {dashboard.projeto && <span className="ml-auto text-amber-400 text-sm">{dashboard.projeto}</span>}
+          </header>
+          <Nav active={active} setActive={setActive} />
+          <main className="p-4">
+            {pages[active]}
+          </main>
+          <footer className="text-center text-gray-600 text-xs py-4 border-t border-gray-800">
+            GSD Ouro v0.1 — Kit Padrão Ouro
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
