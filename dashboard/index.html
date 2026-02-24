@@ -1,40 +1,263 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GSD Ouro — Dashboard</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#09090b;color:#e4e4e7;line-height:1.5}
-a{color:#fbbf24;text-decoration:none}
-.container{max-width:1200px;margin:0 auto;padding:0 24px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GSD Ouro — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'DM Sans',system-ui,sans-serif; background:#09090b; color:#e4e4e7; min-height:100vh; }
+    .mono { font-family:'JetBrains Mono',monospace; }
+    a { color:#fbbf24; text-decoration:none; }
 
-/* Layout */
-header{padding:16px 24px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;background:#09090b}
-nav{display:flex;gap:2px;border-bottom:1px solid #27272a;padding:0 24px;overflow-x:auto;background:rgba(9,9,11,0.8);position:sticky;top:0;z-index:10}
-nav button{padding:12px 16px;font-size:14px;white-space:nowrap;background:none;border:none;border-bottom:2px solid transparent;color:#71717a;cursor:pointer;font-family:inherit;transition:all .2s}
-nav button:hover{color:#a1a1aa}
-nav button.active{border-bottom-color:#f59e0b;color:#f59e0b;font-weight:600}
-main{padding:24px}
-footer{text-align:center;padding:16px;font-size:12px;color:#52525b;border-top:1px solid #18181b;margin-top:32px}
+    /* Layout */
+    header { padding:16px 24px; border-bottom:1px solid #27272a; display:flex; align-items:center; justify-content:space-between; }
+    nav { display:flex; gap:2px; border-bottom:1px solid #27272a; padding:0 24px; overflow-x:auto; position:sticky; top:0; z-index:10; background:#09090b; }
+    nav button { padding:12px 16px; font-size:13px; border:none; background:none; color:#71717a; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; font-family:inherit; }
+    nav button:hover { color:#a1a1aa; }
+    nav button.active { color:#fbbf24; border-bottom-color:#fbbf24; font-weight:600; }
+    main { max-width:1200px; margin:0 auto; padding:24px; }
+    footer { text-align:center; padding:16px; font-size:11px; color:#3f3f46; border-top:1px solid #18181b; margin-top:32px; }
 
-/* Grid */
-.grid{display:grid;gap:16px}
-.g2{grid-template-columns:repeat(2,1fr)}
-.g3{grid-template-columns:repeat(3,1fr)}
-.g4{grid-template-columns:repeat(4,1fr)}
-.g5-3{grid-template-columns:3fr 2fr}
-.g2-eq{grid-template-columns:1fr 1fr}
-@media(max-width:900px){.g4,.g3,.g5-3,.g2-eq{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.g4,.g3,.g5-3,.g2-eq,.g2{grid-template-columns:1fr}}
+    /* Grid */
+    .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+    .grid2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+    .grid53 { display:grid; grid-template-columns:3fr 2fr; gap:16px; }
+    @media(max-width:768px) { .grid4,.grid2,.grid53 { grid-template-columns:1fr; } }
 
-/* Components */
-.card{background:rgba(24,24,27,0.8);border:1px solid #27272a;border-radius:12px;padding:20px}
-.card.glow{box-shadow:0 0 20px rgba(245,158,11,0.06)}
-.card.gold-border{border-color:rgba(245,158,11,0.2)}
-.card.green-border{border-color:rgba(34,197,94,0.2)}
-.section-title{font-size:13px;font-weight:600;color:#d4d4d8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px}
-</style>
+    /* Cards */
+    .card { background:#18181b; border:1px solid #27272a; border-radius:12px; padding:20px; }
+    .card.glow { box-shadow:0 0 20px rgba(245,158,11,0.06); }
+    .card h2 { font-size:12px; font-weight:600; color:#a1a1aa; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+    .card .big { font-size:28px; font-weight:700; color:#fbbf24; }
+    .card .sub { font-size:11px; color:#52525b; margin-top:4px; }
+    .space > * + * { margin-top:16px; }
+
+    /* Badges */
+    .badge { display:inline-block; font-size:10px; padding:2px 8px; border-radius:999px; border:1px solid; }
+    .badge-green { background:rgba(34,197,94,0.1); color:#4ade80; border-color:rgba(34,197,94,0.2); }
+    .badge-yellow { background:rgba(251,191,36,0.1); color:#fbbf24; border-color:rgba(251,191,36,0.2); }
+    .badge-red { background:rgba(239,68,68,0.1); color:#f87171; border-color:rgba(239,68,68,0.2); }
+    .badge-zinc { background:rgba(113,113,122,0.1); color:#a1a1aa; border-color:rgba(113,113,122,0.2); }
+    .badge-blue { background:rgba(59,130,246,0.1); color:#60a5fa; border-color:rgba(59,130,246,0.2); }
+
+    /* Bars */
+    .bar-track { height:18px; background:#27272a; border-radius:9px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:9px; transition:width 0.8s ease; }
+    .phase-track { height:7px; background:#27272a; border-radius:4px; overflow:hidden; }
+    .phase-fill { height:100%; border-radius:4px; }
+
+    /* Table */
+    table { width:100%; font-size:13px; border-collapse:collapse; }
+    th { text-align:left; padding:10px 12px; color:#71717a; font-size:11px; font-weight:500; border-bottom:1px solid #27272a; }
+    td { padding:10px 12px; border-bottom:1px solid #18181b; }
+    tr:hover td { background:#1a1a1e; }
+    .tc { text-align:center; }
+
+    /* Alert boxes */
+    .alert { font-size:13px; padding:10px 14px; border-radius:8px; border:1px solid; }
+    .alert-warn { background:rgba(251,191,36,0.04); border-color:rgba(251,191,36,0.1); color:#fbbf24; }
+    .alert-info { background:rgba(59,130,246,0.04); border-color:rgba(59,130,246,0.1); color:#60a5fa; }
+    .alert-ok { background:rgba(34,197,94,0.04); border-color:rgba(34,197,94,0.1); color:#4ade80; }
+
+    /* Prompt */
+    textarea { width:100%; background:#1a1a1e; border:1px solid #27272a; border-radius:8px; padding:12px; color:#e4e4e7; font-size:13px; font-family:inherit; resize:none; height:80px; outline:none; }
+    textarea:focus { border-color:#fbbf24; box-shadow:0 0 0 2px rgba(251,191,36,0.15); }
+    select { background:#1a1a1e; border:1px solid #27272a; border-radius:8px; padding:6px 10px; color:#e4e4e7; font-size:12px; font-family:inherit; }
+    .btn { padding:10px 20px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .btn-gold { background:#f59e0b; color:#09090b; }
+    .btn-gold:hover { background:#d97706; }
+    .btn-sm { padding:6px 12px; font-size:11px; background:#27272a; color:#e4e4e7; border:1px solid #3f3f46; border-radius:8px; cursor:pointer; font-family:inherit; }
+    pre.result { background:#09090b; border:1px solid #27272a; border-radius:8px; padding:14px; font-size:11px; color:#a1a1aa; white-space:pre-wrap; max-height:240px; overflow:auto; }
+
+    /* Pages */
+    .page { display:none; animation:fadeIn .3s ease; }
+    .page.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+    /* Chart bars (CSS only) */
+    .chart-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .chart-label { width:100px; font-size:11px; color:#71717a; flex-shrink:0; text-align:right; }
+    .chart-bar { flex:1; height:14px; background:#27272a; border-radius:7px; overflow:hidden; }
+    .chart-bar > div { height:100%; border-radius:7px; }
+    .chart-val { width:60px; font-size:11px; text-align:right; flex-shrink:0; }
+
+    /* Donut (CSS only) */
+    .donut { width:160px; height:160px; border-radius:50%; position:relative; margin:0 auto; }
+    .donut-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+    .legend { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:12px; font-size:11px; }
+    .legend span::before { content:''; display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+  </style>
 </head>
 <body>
+<header>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#fbbf24,#d97706);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#09090b">🏆</div>
+    <div><div style="font-size:16px;font-weight:700">GSD OURO</div><div style="font-size:11px;color:#52525b">Appvida — App de saúde e bem-estar</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="badge badge-yellow mono">Sessão #24</span>
+    <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span>
+    <span style="font-size:11px;color:#52525b">Ativo</span>
+  </div>
+</header>
+
+<nav id="nav">
+  <button class="active" onclick="show('overview')">🏠 Visão Geral</button>
+  <button onclick="show('costs')">💰 Economia</button>
+  <button onclick="show('ias')">🤖 IAs</button>
+  <button onclick="show('prompts')">✨ Prompts</button>
+  <button onclick="show('sessions')">📅 Sessões</button>
+  <button onclick="show('quality')">✅ Qualidade</button>
+</nav>
+
+<main class="space">
+<!-- ═══ PAGE 1: VISÃO GERAL ═══ -->
+<div id="p-overview" class="page active space">
+  <div class="grid4">
+    <div class="card glow"><h2>📦 Progresso</h2><div class="big mono">42%</div><div class="sub">5 de 9 fases concluídas</div></div>
+    <div class="card glow"><h2>💰 Economia</h2><div class="big mono">91.1%</div><div class="sub">$44.43 economizados</div></div>
+    <div class="card glow"><h2>⚡ Velocidade</h2><div class="big mono">3.2/h</div><div class="sub">↑ 12% vs semana anterior</div></div>
+    <div class="card glow"><h2>🎯 Qualidade</h2><div class="big mono">94.3%</div><div class="sub">conforme Kit Ouro</div></div>
+  </div>
+
+  <div class="grid53">
+    <div class="card"><h2>📈 Custo ao Longo do Tempo</h2>
+      <div style="font-size:11px;color:#52525b;margin-bottom:8px">Vermelho=Se só Claude | Amarelo=Custo real</div>
+      <div class="chart-row"><div class="chart-label">S1</div><div class="chart-bar"><div style="width:64%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$5.20</div></div>
+      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:5%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.42</div></div>
+      <div class="chart-row"><div class="chart-label">S3</div><div class="chart-bar"><div style="width:75%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$6.10</div></div>
+      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:7%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.55</div></div>
+      <div class="chart-row"><div class="chart-label">S5</div><div class="chart-bar"><div style="width:72%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$5.90</div></div>
+      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:6%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.48</div></div>
+      <div class="chart-row"><div class="chart-label">S7</div><div class="chart-bar"><div style="width:100%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$8.15</div></div>
+      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:10%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.85</div></div>
+    </div>
+    <div class="card"><h2>🍩 Distribuição IAs</h2>
+      <div class="donut" style="background:conic-gradient(#fbbf24 0% 26%,#22c55e 26% 65%,#3b82f6 65% 88%,#a855f7 88% 100%)">
+        <div class="donut-center" style="width:80px;height:80px;background:#18181b;border-radius:50%;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;color:#71717a">383 calls</span></div>
+      </div>
+      <div class="legend">
+        <span style="color:#fbbf24">● Claude 26%</span>
+        <span style="color:#22c55e">● Codestral 39%</span>
+        <span style="color:#3b82f6">● Gemini 23%</span>
+        <span style="color:#a855f7">● DeepSeek 12%</span>
+      </div>
+    </div>
+  </div>
+  <div class="card"><h2>🗺️ Timeline do Projeto</h2>
+    <div id="timeline"></div>
+  </div>
+  <div class="card" style="border-color:rgba(251,191,36,0.2)"><h2>⚠️ Alertas (2 ativos)</h2>
+    <div class="space"><div class="alert alert-warn">• Codestral: 4 desvios de padrão — considerar trocar para lógica de autenticação</div>
+    <div class="alert alert-info">• Limite Mistral: 78% usado este mês</div></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 2: ECONOMIA ═══ -->
+<div id="p-costs" class="page space">
+  <div class="card glow"><div class="grid4" style="grid-template-columns:1fr 1fr 1fr;text-align:center">
+    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Custo Real</div><div class="big mono">$4.32</div></div>
+    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Se Só Claude</div><div class="big mono" style="color:#f87171">$48.75</div></div>
+    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Economia</div><div class="big mono" style="color:#4ade80">$44.43</div><span class="badge badge-green mono">91.1%</span></div>
+  </div></div>
+  <div class="grid2">
+    <div class="card"><h2>💳 Custo por IA</h2><div id="custoIA"></div></div>
+    <div class="card"><h2>🎯 Custo por Tarefa</h2><div id="custoTarefa"></div></div>
+  </div>
+  <div class="card" style="border-color:rgba(34,197,94,0.2)"><h2>🔮 Projeção até Conclusão</h2>
+    <div class="grid4" style="grid-template-columns:1fr 1fr 1fr;text-align:center">
+      <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Total Estimado</div><div style="font-size:22px;font-weight:700;color:#fbbf24" class="mono">$12.50</div></div>
+      <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Sem Kit Ouro</div><div style="font-size:22px;font-weight:700;color:#f87171" class="mono">$142.00</div></div>
+      <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Economia</div><div style="font-size:22px;font-weight:700;color:#4ade80" class="mono">$129.50</div><span class="badge badge-green mono">91.2%</span></div>
+    </div>
+  </div>
+</div>
+<!-- ═══ PAGE 3: IAs ═══ -->
+<div id="p-ias" class="page space">
+  <div class="card"><h2>📊 Tabela Comparativa</h2><table><thead><tr><th>IA</th><th class="tc">Chamadas</th><th class="tc">Sucesso</th><th class="tc">Latência</th><th class="tc">Custo</th><th class="tc">Desvios</th></tr></thead><tbody id="tblIAs"></tbody></table></div>
+  <div class="card"><h2>🏆 Melhor IA por Tarefa</h2><table><thead><tr><th>Tarefa</th><th>Melhor</th><th>2ª opção</th></tr></thead><tbody id="tblMelhor"></tbody></table></div>
+  <div class="card"><h2>⚠️ Recomendações</h2><div class="space">
+    <div class="alert alert-warn">Codestral tem 4 desvios em autenticação → Usar Claude Haiku para módulos de segurança</div>
+    <div class="alert" style="background:#18181b;border-color:#27272a;color:#a1a1aa">DeepSeek V3: 1 falha em 41 chamadas → Dentro do normal. Monitorar.</div>
+    <div class="alert alert-ok">Gemini Pro: 95% sucesso a custo zero → Considerar usar mais para tarefas gerais</div>
+  </div></div>
+</div>
+
+<!-- ═══ PAGE 4: PROMPTS ═══ -->
+<div id="p-prompts" class="page space">
+  <div class="card"><h2>✨ O que você precisa?</h2>
+    <textarea id="promptIn" placeholder='Escreva com suas palavras... ex: "preciso de um componente de upload de fotos"'></textarea>
+    <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">Tipo</label><select><option>Auto</option><option>Código</option><option>Doc</option><option>Debug</option><option>Teste</option></select></div>
+      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">IA destino</label><select><option>Auto</option><option>Claude</option><option>Codestral</option><option>Gemini</option><option>DeepSeek</option></select></div>
+      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">Modo</label><select><option>Completo</option><option>Rápido</option><option>Preview</option></select></div>
+    </div>
+    <button class="btn btn-gold" style="margin-top:12px" onclick="gerarPrompt()" id="btnGerar">🚀 Gerar Prompt Otimizado</button>
+  </div>
+  <div id="promptRes" class="card" style="display:none;border-color:rgba(251,191,36,0.2)"><h2>🔧 Resultado</h2><div id="promptMeta" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px"></div><pre class="result" id="promptOut"></pre>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('promptOut').textContent)">✅ Copiar</button><button class="btn-sm">📋 Claude Code</button><button class="btn-sm">⭐ Salvar</button><button class="btn-sm" onclick="gerarPrompt()">🔄 Regenerar</button></div>
+  </div>
+  <div class="card"><h2>📜 Histórico</h2><div id="promptHist"></div></div>
+</div>
+<!-- ═══ PAGE 5: SESSÕES ═══ -->
+<div id="p-sessions" class="page space">
+  <div class="card"><h2>📅 Sessões Recentes</h2><table><thead><tr><th>Data</th><th class="tc">Duração</th><th class="tc">Tarefas</th><th class="tc">Custo</th><th>IAs</th></tr></thead><tbody id="tblSessoes"></tbody></table></div>
+  <div class="card"><h2>📖 Legenda</h2><div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11px;color:#71717a">
+    <span><b class="mono" style="color:#e4e4e7">CS</b>=Claude Sonnet</span><span><b class="mono" style="color:#e4e4e7">CH</b>=Claude Haiku</span><span><b class="mono" style="color:#e4e4e7">CD</b>=Codestral</span><span><b class="mono" style="color:#e4e4e7">GM</b>=Gemini Pro</span><span><b class="mono" style="color:#e4e4e7">DS</b>=DeepSeek</span>
+  </div></div>
+</div>
+
+<!-- ═══ PAGE 6: QUALIDADE ═══ -->
+<div id="p-quality" class="page space">
+  <div class="card glow"><h2>🎯 Conformidade Kit Ouro</h2>
+    <div style="display:flex;align-items:center;gap:16px"><div style="flex:1;height:12px;background:#27272a;border-radius:6px;overflow:hidden"><div style="width:94.3%;height:100%;border-radius:6px;background:linear-gradient(90deg,#f59e0b,#eab308)"></div></div><div class="big mono" style="font-size:24px">94.3%</div></div>
+  </div>
+  <div class="card"><h2>🔍 Desvios Encontrados</h2><table><thead><tr><th>#</th><th>Tipo</th><th>IA</th><th class="tc">Fase</th><th>Status</th></tr></thead><tbody id="tblDesvios"></tbody></table></div>
+  <div class="grid2">
+    <div class="card"><h2>🍩 Padrão de Desvios</h2>
+      <div class="donut" style="background:conic-gradient(#ef4444 0% 43%,#fbbf24 43% 57%,#3b82f6 57% 71%,#6b7280 71% 100%)">
+        <div class="donut-center" style="width:80px;height:80px;background:#18181b;border-radius:50%;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;color:#71717a">7 total</span></div>
+      </div>
+      <div class="legend"><span style="color:#ef4444">● CSS 42.9%</span><span style="color:#fbbf24">● Componente 14.3%</span><span style="color:#3b82f6">● Naming 14.3%</span><span style="color:#6b7280">● Outros 28.5%</span></div>
+    </div>
+    <div class="card" style="border-color:rgba(251,191,36,0.2)"><h2>💡 Recomendações</h2><div class="space">
+      <div class="alert alert-warn" style="font-size:12px"><b>Reforçar CSS para Codestral</b><br><span style="color:#71717a">Principal fonte de desvios (42.9%)</span></div>
+      <div class="alert" style="background:#18181b;border-color:#27272a;color:#a1a1aa;font-size:12px"><b>Monitorar DeepSeek naming</b><br><span style="color:#52525b">2 desvios. Adicionar naming conventions.</span></div>
+      <div class="alert alert-ok" style="font-size:12px"><b>Claude e Gemini: excelente</b><br><span style="color:#52525b">0 desvios. Priorizar para tarefas sensíveis.</span></div>
+    </div></div>
+  </div>
+</div>
+</main>
+<footer>GSD Ouro v0.1 — Dashboard Web — Dados de demonstração</footer>
+
+<script>
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-'+id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>{b.classList.remove('active');if(b.textContent.toLowerCase().includes(id.slice(0,4)))b.classList.add('active')});} 
+document.querySelectorAll('nav button').forEach((b,i)=>{const ids=['overview','costs','ias','prompts','sessions','quality'];b.onclick=()=>show(ids[i]);});
+
+const fases=[{n:'Fundação',p:100,s:'done'},{n:'Auth',p:100,s:'done'},{n:'Landing',p:100,s:'done'},{n:'Área Usuário',p:100,s:'done'},{n:'Módulos Core',p:100,s:'done'},{n:'Integrações',p:35,s:'current'},{n:'Admin',p:0,s:'pending'},{n:'Otimização',p:0,s:'pending'},{n:'Testes & Deploy',p:0,s:'pending'}];
+
+document.getElementById('timeline').innerHTML=fases.map((f,i)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="width:20px;font-size:11px;color:#52525b">${i+1}</span><div class="phase-track" style="flex:1"><div class="phase-fill" style="width:${f.p}%;background:${f.s==='done'?'#22c55e':f.s==='current'?'#fbbf24':'#3f3f46'}"></div></div><span style="width:120px;font-size:11px;color:${f.s==='done'?'#4ade80':f.s==='current'?'#fbbf24':'#52525b'}">${f.s==='done'?'✅':f.s==='current'?'🔄':'⏳'} ${f.n}</span></div>`).join('');
+
+function bars(el,data,max){document.getElementById(el).innerHTML=data.sort((a,b)=>b.v-a.v).map(d=>`<div class="chart-row"><div class="chart-label">${d.n}</div><div class="chart-bar"><div style="width:${d.v>0?Math.max(d.v/max*100,3):3}%;background:${d.v>0?'#fbbf24':'#22c55e'}"></div></div><div class="chart-val mono" style="color:${d.v>0?'#fbbf24':'#4ade80'}">${d.v>0?'$'+d.v.toFixed(2):'grátis'}</div></div>`).join('');}
+bars('custoIA',[{n:'Claude S',v:3.20},{n:'Haiku',v:0.85},{n:'Gemini F',v:0.27},{n:'Gemini P',v:0},{n:'Codestral',v:0},{n:'DeepSeek',v:0}],3.20);
+bars('custoTarefa',[{n:'Planejamento',v:1.80},{n:'Verificação',v:1.20},{n:'Revisão',v:0.85},{n:'Debug',v:0.27},{n:'Código',v:0},{n:'Docs',v:0},{n:'Testes',v:0},{n:'Pesquisa',v:0}],1.80);
+const ias=[{ia:'Claude Sonnet',ch:89,suc:97,lat:'3.2s',c:'$3.20',d:1},{ia:'Gemini Pro',ch:78,suc:95,lat:'2.1s',c:'grátis',d:0},{ia:'DeepSeek V3',ch:41,suc:91,lat:'2.4s',c:'grátis',d:2},{ia:'Codestral',ch:134,suc:89,lat:'1.8s',c:'grátis',d:4},{ia:'Claude Haiku',ch:23,suc:95.6,lat:'1.2s',c:'$0.85',d:0},{ia:'Gemini Flash',ch:18,suc:94.4,lat:'0.9s',c:'$0.27',d:0}];
+document.getElementById('tblIAs').innerHTML=ias.map(a=>`<tr><td style="font-weight:500">${a.ia}</td><td class="tc mono">${a.ch}</td><td class="tc mono" style="color:${a.suc>=95?'#4ade80':a.suc>=90?'#fbbf24':'#f87171'}">${a.suc}%</td><td class="tc mono">${a.lat}</td><td class="tc">${a.c==='grátis'?'<span style="color:#4ade80">grátis</span>':`<span class="mono" style="color:#fbbf24">${a.c}</span>`}</td><td class="tc" style="color:${a.d===0?'#4ade80':'#f87171'}">${a.d}</td></tr>`).join('');
+
+const melhor=[{t:'Código complexo',m:'Claude Sonnet',s:'DeepSeek R1'},{t:'Código simples',m:'Codestral',s:'DeepSeek V3'},{t:'Documentação',m:'Gemini Pro',s:'Gemini Flash'},{t:'Testes',m:'DeepSeek V3',s:'Codestral'},{t:'Debug',m:'Claude Sonnet',s:'Claude Haiku'},{t:'Pesquisa',m:'Gemini Pro',s:'Claude Sonnet'}];
+document.getElementById('tblMelhor').innerHTML=melhor.map(m=>`<tr><td>${m.t}</td><td><span class="badge badge-yellow mono">${m.m}</span></td><td><span class="badge badge-zinc mono">${m.s}</span></td></tr>`).join('');
+
+const sessoes=[{d:'24/02 #3',dur:'2h15',t:8,c:'$0.45',ias:'CS,CD,GM'},{d:'24/02 #2',dur:'1h40',t:5,c:'$0.32',ias:'CS,GM,DS'},{d:'24/02 #1',dur:'0h45',t:3,c:'$0.12',ias:'CS,CD'},{d:'23/02 #2',dur:'3h10',t:12,c:'$0.78',ias:'CS,CD,GM,DS'},{d:'23/02 #1',dur:'1h55',t:7,c:'$0.41',ias:'CS,CD,GM'},{d:'22/02 #2',dur:'2h30',t:9,c:'$0.52',ias:'CS,CD,GM'},{d:'22/02 #1',dur:'1h15',t:4,c:'$0.18',ias:'CD,GM'},{d:'21/02 #1',dur:'2h45',t:11,c:'$0.67',ias:'CS,CD,GM,DS'}];
+document.getElementById('tblSessoes').innerHTML=sessoes.map(s=>`<tr><td class="mono" style="color:#fbbf24;font-size:11px">${s.d}</td><td class="tc mono" style="font-size:11px">${s.dur}</td><td class="tc mono" style="font-size:11px">${s.t}</td><td class="tc mono" style="color:#fbbf24;font-size:11px">${s.c}</td><td style="font-size:11px">${s.ias.split(',').map(x=>`<span class="badge badge-zinc mono">${x}</span> `).join('')}</td></tr>`).join('');
+
+const desvios=[{id:1,t:'CSS custom',ia:'Codestral',f:2},{id:2,t:'Componente fora',ia:'Codestral',f:3},{id:3,t:'Espaçamento',ia:'DeepSeek',f:3},{id:4,t:'Import errado',ia:'Codestral',f:3},{id:5,t:'Classe Tailwind',ia:'Codestral',f:4},{id:6,t:'Naming pattern',ia:'DeepSeek',f:5},{id:7,t:'Validação falta',ia:'Claude',f:5}];
+document.getElementById('tblDesvios').innerHTML=desvios.map(d=>`<tr><td class="mono" style="color:#52525b;font-size:11px">${d.id}</td><td style="font-size:12px">${d.t}</td><td><span class="badge badge-zinc mono">${d.ia}</span></td><td class="tc mono" style="font-size:11px">${d.f}</td><td><span class="badge badge-green mono">✅ corrigido</span></td></tr>`).join('');
+const prompts=[{h:'15:42',t:'página de perfil...',ia:'Claude',ok:true},{h:'15:20',t:'documentar api...',ia:'Gemini',ok:true},{h:'14:55',t:'botão de confirmação...',ia:'Codestral',ok:true},{h:'14:30',t:'corrigir erro 500...',ia:'Claude',ok:true},{h:'14:10',t:'testes do login...',ia:'DeepSeek',ok:false}];
+document.getElementById('promptHist').innerHTML=prompts.map(p=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #18181b"><span class="mono" style="font-size:11px;color:#52525b;width:40px">${p.h}</span><span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"${p.t}"</span><span class="badge badge-zinc mono">${p.ia}</span><span style="font-size:11px;color:${p.ok?'#4ade80':'#fbbf24'}">${p.ok?'✅ 1ª':'⚠️ 2ª'}</span></div>`).join('');
+
+function gerarPrompt(){const t=document.getElementById('promptIn').value.trim();if(!t)return;const b=document.getElementById('btnGerar');b.textContent='⏳ Gerando...';b.disabled=true;setTimeout(()=>{const tk=Math.floor(Math.random()*800+800);document.getElementById('promptMeta').innerHTML=`<span style="font-size:11px"><span style="color:#52525b">Otimizadora:</span> Gemini 2.5 Pro</span><span style="font-size:11px"><span style="color:#52525b">Destino:</span> <b style="color:#fbbf24">Codestral</b></span><span style="font-size:11px"><span style="color:#52525b">Framework:</span> RISE</span><span style="font-size:11px"><span style="color:#52525b">Tokens:</span> <span class="mono">~${tk}</span></span><span style="font-size:11px"><span style="color:#52525b">Custo:</span> <span class="mono" style="color:#4ade80">$0.00</span></span>`;document.getElementById('promptOut').textContent=`Role: Desenvolvedor React especializado\n\nInstructions:\n1. Usar APENAS componentes do Kit Ouro\n2. NÃO criar CSS custom — apenas TailwindCSS\n3. Seguir espaçamento: p-4 para cards, gap-6 entre seções\n4. Responsivo: mobile-first\n5. Acessibilidade: labels, aria-labels, focus states\n\nContext: ${t.slice(0,60)}...\n\nVerify:\n□ Componentes são do Kit Ouro\n□ Nenhuma classe CSS fora do padrão\n□ Responsivo em mobile (320px) e desktop (1280px)`;document.getElementById('promptRes').style.display='block';b.textContent='🚀 Gerar Prompt Otimizado';b.disabled=false;},1500);}
+</script>
+</body>
+</html>
