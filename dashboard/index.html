@@ -9,217 +9,867 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['DM Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+          colors: { ouro: { 50:'#fffbeb',100:'#fef3c7',200:'#fde68a',300:'#fcd34d',400:'#fbbf24',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f' } }
+        }
+      }
+    }
+  </script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .tab-active { border-bottom: 2px solid #f59e0b; color: #f59e0b; }
+    * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #09090b; color: #e4e4e7; margin: 0; }
+    .tab-active { border-bottom: 2px solid #f59e0b; color: #f59e0b; font-weight: 600; }
+    .glow-ouro { box-shadow: 0 0 20px rgba(245,158,11,0.08); }
+    .bar-fill { transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .phase-bar { height: 8px; border-radius: 4px; background: #27272a; overflow: hidden; }
+    .phase-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+    .conformance-bar { height: 12px; border-radius: 6px; background: #27272a; overflow: hidden; }
+    .conformance-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #f59e0b, #eab308); }
+    textarea:focus, select:focus, input:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,0.2); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #18181b; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+    .tooltip-custom { background: #18181b !important; border: 1px solid #3f3f46 !important; border-radius: 8px !important; }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
+<body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useEffect } = React;
-    const API = 'http://localhost:3333/api';
+    const { useState, useEffect, useMemo } = React;
+    const { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+            XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = Recharts;
 
-    // Card component
-    function Card({ title, value, subtitle, icon }) {
+    // ═══════════════════════════════════════════
+    // MOCK DATA (substituído por API real em produção)
+    // ═══════════════════════════════════════════
+    const MOCK = {
+      projeto: { nome: 'Appvida', descricao: 'App de saúde e bem-estar', sessaoAtual: 24 },
+      resumo: { progresso: 42, economia: 91.1, velocidade: 3.2, velocidadeDelta: 12, qualidade: 94.3,
+                custoReal: 4.32, custoHipotetico: 48.75, economiaUsd: 44.43 },
+      fases: [
+        { nome:'Fundação', progresso:100, status:'done', bugs:0 },
+        { nome:'Auth', progresso:100, status:'done', bugs:0 },
+        { nome:'Landing', progresso:100, status:'done', bugs:5 },
+        { nome:'Área Usuário', progresso:100, status:'done', bugs:0 },
+        { nome:'Módulos Core', progresso:100, status:'done', bugs:2 },
+        { nome:'Integrações', progresso:35, status:'current', bugs:0 },
+        { nome:'Admin', progresso:0, status:'pending', bugs:0 },
+        { nome:'Otimização', progresso:0, status:'pending', bugs:0 },
+        { nome:'Testes & Deploy', progresso:0, status:'pending', bugs:0 },
+      ],
+      custoSemanal: [
+        { sem:'S1', real:0.42, hipotetico:5.20 },{ sem:'S2', real:0.68, hipotetico:7.80 },
+        { sem:'S3', real:0.55, hipotetico:6.10 },{ sem:'S4', real:0.71, hipotetico:8.40 },
+        { sem:'S5', real:0.48, hipotetico:5.90 },{ sem:'S6', real:0.63, hipotetico:7.20 },
+        { sem:'S7', real:0.85, hipotetico:8.15 },
+      ],
+      distribuicaoIA: [
+        { nome:'Claude Sonnet', valor:26, cor:'#f59e0b' },{ nome:'Codestral', valor:39, cor:'#22c55e' },
+        { nome:'Gemini Pro', valor:23, cor:'#3b82f6' },{ nome:'DeepSeek V3', valor:12, cor:'#a855f7' },
+      ],
+      custoIA: [
+        { ia:'Claude Sonnet', custo:3.20, chamadas:89 },{ ia:'Claude Haiku', custo:0.85, chamadas:23 },
+        { ia:'Gemini Flash', custo:0.27, chamadas:18 },{ ia:'Gemini Pro', custo:0, chamadas:78 },
+        { ia:'Codestral', custo:0, chamadas:134 },{ ia:'DeepSeek V3', custo:0, chamadas:41 },
+      ],
+      custoTarefa: [
+        { tarefa:'Planejamento', custo:1.80, ia:'Claude Sonnet' },{ tarefa:'Verificação', custo:1.20, ia:'Claude Sonnet' },
+        { tarefa:'Revisão código', custo:0.85, ia:'Claude Haiku' },{ tarefa:'Debug flash', custo:0.27, ia:'Gemini Flash' },
+        { tarefa:'Geração código', custo:0, ia:'Codestral' },{ tarefa:'Documentação', custo:0, ia:'Gemini Pro' },
+        { tarefa:'Testes', custo:0, ia:'DeepSeek V3' },{ tarefa:'Pesquisa', custo:0, ia:'Gemini Pro' },
+      ],
+      performanceIA: [
+        { ia:'Claude Sonnet', chamadas:89, sucesso:97.0, latencia:'3.2s', custo:'$3.20', desvios:1 },
+        { ia:'Gemini Pro', chamadas:78, sucesso:95.0, latencia:'2.1s', custo:'$0.00', desvios:0 },
+        { ia:'DeepSeek V3', chamadas:41, sucesso:91.0, latencia:'2.4s', custo:'$0.00', desvios:2 },
+        { ia:'Codestral', chamadas:134, sucesso:89.0, latencia:'1.8s', custo:'$0.00', desvios:4 },
+        { ia:'Claude Haiku', chamadas:23, sucesso:95.6, latencia:'1.2s', custo:'$0.85', desvios:0 },
+        { ia:'Gemini Flash', chamadas:18, sucesso:94.4, latencia:'0.9s', custo:'$0.27', desvios:0 },
+      ],
+      melhorPorTarefa: [
+        { tarefa:'Código complexo', melhor:'Claude Sonnet', segunda:'DeepSeek R1' },
+        { tarefa:'Código simples', melhor:'Codestral', segunda:'DeepSeek V3' },
+        { tarefa:'Documentação', melhor:'Gemini Pro', segunda:'Gemini Flash' },
+        { tarefa:'Testes', melhor:'DeepSeek V3', segunda:'Codestral' },
+        { tarefa:'Debug', melhor:'Claude Sonnet', segunda:'Claude Haiku' },
+        { tarefa:'Pesquisa', melhor:'Gemini Pro', segunda:'Claude Sonnet' },
+      ],
+      alertas: [
+        { tipo:'warn', msg:'Codestral: 4 desvios de padrão — considerar trocar para lógica de autenticação' },
+        { tipo:'info', msg:'Limite Mistral: 78% usado este mês' },
+      ],
+      recomendacoesIA: [
+        { tipo:'warn', msg:'Codestral tem 4 desvios em código de autenticação.', acao:'Usar Claude Haiku para módulos de segurança' },
+        { tipo:'ok', msg:'DeepSeek V3 teve 1 falha de API em 41 chamadas.', acao:'Dentro do normal. Monitorar.' },
+        { tipo:'success', msg:'Gemini Pro está com 95% sucesso a custo zero.', acao:'Considerar usar mais para tarefas gerais.' },
+      ],
+      sessoes: [
+        { data:'24/02 #3', duracao:'2h15', tarefas:8, custo:'$0.45', ias:'CS,CD,GM' },
+        { data:'24/02 #2', duracao:'1h40', tarefas:5, custo:'$0.32', ias:'CS,GM,DS' },
+        { data:'24/02 #1', duracao:'0h45', tarefas:3, custo:'$0.12', ias:'CS,CD' },
+        { data:'23/02 #2', duracao:'3h10', tarefas:12, custo:'$0.78', ias:'CS,CD,GM,DS' },
+        { data:'23/02 #1', duracao:'1h55', tarefas:7, custo:'$0.41', ias:'CS,CD,GM' },
+        { data:'22/02 #2', duracao:'2h30', tarefas:9, custo:'$0.52', ias:'CS,CD,GM' },
+        { data:'22/02 #1', duracao:'1h15', tarefas:4, custo:'$0.18', ias:'CD,GM' },
+        { data:'21/02 #1', duracao:'2h45', tarefas:11, custo:'$0.67', ias:'CS,CD,GM,DS' },
+      ],
+      desvios: [
+        { id:1, tipo:'CSS custom', ia:'Codestral', fase:2, status:'corrigido' },
+        { id:2, tipo:'Componente fora', ia:'Codestral', fase:3, status:'corrigido' },
+        { id:3, tipo:'Espaçamento', ia:'DeepSeek', fase:3, status:'corrigido' },
+        { id:4, tipo:'Import errado', ia:'Codestral', fase:3, status:'corrigido' },
+        { id:5, tipo:'Classe Tailwind', ia:'Codestral', fase:4, status:'corrigido' },
+        { id:6, tipo:'Naming pattern', ia:'DeepSeek', fase:5, status:'corrigido' },
+        { id:7, tipo:'Validação falta', ia:'Claude', fase:5, status:'corrigido' },
+      ],
+      padraoDesvios: [
+        { tipo:'CSS custom', qtd:3, pct:42.9, cor:'#ef4444' },
+        { tipo:'Componente fora do Kit', qtd:1, pct:14.3, cor:'#f59e0b' },
+        { tipo:'Naming inconsistente', qtd:1, pct:14.3, cor:'#3b82f6' },
+        { tipo:'Outros', qtd:2, pct:28.5, cor:'#6b7280' },
+      ],
+      promptsHistorico: [
+        { hora:'15:42', texto:'página de perfil...', ia:'Claude', resultado:'sucesso', tentativa:1 },
+        { hora:'15:20', texto:'documentar api...', ia:'Gemini', resultado:'sucesso', tentativa:1 },
+        { hora:'14:55', texto:'botão de confirmação...', ia:'Codestral', resultado:'sucesso', tentativa:1 },
+        { hora:'14:30', texto:'corrigir erro 500...', ia:'Claude', resultado:'sucesso', tentativa:1 },
+        { hora:'14:10', texto:'testes do login...', ia:'DeepSeek', resultado:'aviso', tentativa:2 },
+      ],
+    };
+
+    // ═══════════════════════════════════════════
+    // COMPONENTES UTILITÁRIOS
+    // ═══════════════════════════════════════════
+    function MetricCard({ title, value, subtitle, icon }) {
       return (
-        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <div className="text-gray-400 text-sm mb-1">{icon} {title}</div>
-          <div className="text-2xl font-bold text-amber-400">{value}</div>
-          {subtitle && <div className="text-gray-500 text-xs mt-1">{subtitle}</div>}
+        <div className="bg-zinc-900/80 rounded-xl p-5 border border-zinc-800 glow-ouro fade-in">
+          <div className="text-zinc-400 text-xs font-medium tracking-wide uppercase mb-2">{icon} {title}</div>
+          <div className="text-3xl font-bold text-ouro-400 font-mono">{value}</div>
+          {subtitle && <div className="text-zinc-500 text-xs mt-1.5">{subtitle}</div>}
         </div>
       );
     }
 
-    // Navigation
+    function SectionTitle({ children }) {
+      return <h2 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase mb-3 flex items-center gap-2">{children}</h2>;
+    }
+
+    function Panel({ children, className = '' }) {
+      return <div className={`bg-zinc-900/60 rounded-xl border border-zinc-800/80 p-5 ${className}`}>{children}</div>;
+    }
+
+    function Badge({ color = 'zinc', children }) {
+      const colors = {
+        green: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        yellow: 'bg-ouro-500/10 text-ouro-400 border-ouro-500/20',
+        red: 'bg-red-500/10 text-red-400 border-red-500/20',
+        blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+        zinc: 'bg-zinc-700/30 text-zinc-400 border-zinc-600/30',
+      };
+      return <span className={`inline-flex text-[10px] font-mono px-2 py-0.5 rounded-full border ${colors[color]}`}>{children}</span>;
+    }
+
+    function CustomTooltip({ active, payload, label }) {
+      if (!active || !payload?.length) return null;
+      return (
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 shadow-xl">
+          <p className="text-zinc-400 text-xs mb-1">{label}</p>
+          {payload.map((p, i) => (
+            <p key={i} className="text-xs font-mono" style={{ color: p.color }}>
+              {p.name}: {typeof p.value === 'number' ? `$${p.value.toFixed(2)}` : p.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════
+    // NAVEGAÇÃO
+    // ═══════════════════════════════════════════
     function Nav({ active, setActive }) {
       const tabs = [
-        { id: 'overview', label: '🏠 Visão Geral' },
-        { id: 'costs', label: '💰 Economia' },
-        { id: 'ias', label: '🤖 IAs' },
-        { id: 'prompts', label: '✨ Prompts' },
-        { id: 'sessions', label: '📅 Sessões' },
-        { id: 'quality', label: '✅ Qualidade' },
+        { id:'overview', label:'Visão Geral', icon:'🏠' },
+        { id:'costs', label:'Economia', icon:'💰' },
+        { id:'ias', label:'IAs', icon:'🤖' },
+        { id:'prompts', label:'Prompts', icon:'✨' },
+        { id:'sessions', label:'Sessões', icon:'📅' },
+        { id:'quality', label:'Qualidade', icon:'✅' },
       ];
       return (
-        <nav className="flex gap-1 border-b border-gray-800 px-4 overflow-x-auto">
+        <nav className="flex gap-0.5 border-b border-zinc-800/80 px-6 overflow-x-auto bg-zinc-950/50 backdrop-blur-sm sticky top-0 z-10">
           {tabs.map(t => (
             <button key={t.id}
-              className={`px-3 py-2 text-sm whitespace-nowrap ${active === t.id ? 'tab-active font-semibold' : 'text-gray-400 hover:text-gray-200'}`}
+              className={`px-4 py-3 text-sm whitespace-nowrap transition-all ${active === t.id ? 'tab-active' : 'text-zinc-500 hover:text-zinc-300'}`}
               onClick={() => setActive(t.id)}>
-              {t.label}
+              <span className="mr-1.5">{t.icon}</span>{t.label}
             </button>
           ))}
         </nav>
       );
     }
 
-    // Overview Page
-    function OverviewPage({ data }) {
+    // ═══════════════════════════════════════════
+    // PÁGINA 1: VISÃO GERAL
+    // ═══════════════════════════════════════════
+    function PageOverview() {
+      const d = MOCK;
       return (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card icon="📊" title="PROGRESSO" value={`${data.progresso || 0}%`} subtitle="do projeto" />
-            <Card icon="💰" title="ECONOMIA" value={`${data.economia_pct || 0}%`} subtitle={`$${(data.custo_hipotetico - data.custo_real).toFixed(2)} salvos`} />
-            <Card icon="⚡" title="TAREFAS" value={data.tarefas_concluidas || 0} subtitle="concluídas" />
-            <Card icon="✅" title="QUALIDADE" value={`${data.conformidade || 0}%`} subtitle="conforme Kit" />
+        <div className="space-y-6 fade-in">
+          {/* Metric Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <MetricCard icon="📦" title="Progresso" value={`${d.resumo.progresso}%`} subtitle={`${d.fases.filter(f=>f.status==='done').length} de ${d.fases.length} fases concluídas`} />
+            <MetricCard icon="💰" title="Economia" value={`${d.resumo.economia}%`} subtitle={`$${d.resumo.economiaUsd.toFixed(2)} economizados`} />
+            <MetricCard icon="⚡" title="Velocidade" value={`${d.resumo.velocidade}/h`} subtitle={`↑ ${d.resumo.velocidadeDelta}% vs semana anterior`} />
+            <MetricCard icon="🎯" title="Qualidade" value={`${d.resumo.qualidade}%`} subtitle="conforme Kit Ouro" />
           </div>
-          {data.alertas && data.alertas.length > 0 && (
-            <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-4">
-              <h3 className="text-yellow-400 font-semibold mb-2">⚠️ Alertas</h3>
-              {data.alertas.map((a, i) => <p key={i} className="text-yellow-200 text-sm">• {a}</p>)}
-            </div>
-          )}
-          <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-            <h3 className="font-semibold mb-3">📋 Como Começar</h3>
-            <div className="text-gray-400 text-sm space-y-1">
-              <p>1. Use <code className="text-amber-400">/ouro:novo-projeto</code> para inicializar</p>
-              <p>2. Use <code className="text-amber-400">/ouro:planejar 1</code> para planejar a fase 1</p>
-              <p>3. Use <code className="text-amber-400">/ouro:executar 1</code> para executar</p>
-              <p>4. As métricas aparecerão aqui automaticamente</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
 
-    // Costs Page
-    function CostsPage({ data }) {
-      return (
-        <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <Card icon="💵" title="Custo Real" value={`$${(data.custo_real || 0).toFixed(2)}`} />
-            <Card icon="📊" title="Se Só Claude" value={`$${(data.custo_hipotetico || 0).toFixed(2)}`} />
-            <Card icon="🎉" title="Economia" value={`$${((data.custo_hipotetico || 0) - (data.custo_real || 0)).toFixed(2)}`} subtitle={`${data.economia_pct || 0}%`} />
-          </div>
-          <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-            <p className="text-gray-400 text-sm">Gráficos de custo por IA e por tarefa serão exibidos aqui quando houver dados de sessões.</p>
-          </div>
-        </div>
-      );
-    }
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <Panel className="lg:col-span-3">
+              <SectionTitle>📈 Custo ao Longo do Tempo</SectionTitle>
+              <ResponsiveContainer width="100%" height={220}>
+                <AreaChart data={d.custoSemanal}>
+                  <defs>
+                    <linearGradient id="gradReal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="gradHipo" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                  <XAxis dataKey="sem" tick={{fill:'#71717a',fontSize:11}} axisLine={{stroke:'#27272a'}} />
+                  <YAxis tick={{fill:'#71717a',fontSize:11}} axisLine={{stroke:'#27272a'}} tickFormatter={v=>`$${v}`} />
+                  <Tooltip content={<CustomTooltip/>} />
+                  <Area type="monotone" dataKey="hipotetico" name="Se só Claude" stroke="#ef4444" fill="url(#gradHipo)" strokeWidth={1.5} strokeDasharray="4 4" />
+                  <Area type="monotone" dataKey="real" name="Custo real" stroke="#f59e0b" fill="url(#gradReal)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </Panel>
 
-    // IAs Page
-    function IAsPage() {
-      return (
-        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <h3 className="font-semibold mb-3">🤖 Performance das IAs</h3>
-          <p className="text-gray-400 text-sm mb-4">Tabela comparativa será populada com dados reais das sessões.</p>
-          <table className="w-full text-sm">
-            <thead><tr className="text-gray-500 border-b border-gray-800">
-              <th className="text-left py-2">IA</th><th>Chamadas</th><th>Sucesso</th><th>Custo</th><th>Tier</th>
-            </tr></thead>
-            <tbody className="text-gray-300">
-              <tr className="border-b border-gray-800/50"><td className="py-2">Claude Sonnet</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">Pago</td><td className="text-center">Premium</td></tr>
-              <tr className="border-b border-gray-800/50"><td className="py-2">Codestral</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">$0</td><td className="text-center">Grátis</td></tr>
-              <tr className="border-b border-gray-800/50"><td className="py-2">Gemini Pro</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">$0</td><td className="text-center">Grátis</td></tr>
-              <tr><td className="py-2">DeepSeek V3</td><td className="text-center">—</td><td className="text-center">—</td><td className="text-center">$0</td><td className="text-center">Grátis</td></tr>
-            </tbody>
-          </table>
-        </div>
-      );
-    }
-
-    // Prompts Page
-    function PromptsPage({ prompts }) {
-      return (
-        <div className="space-y-6">
-          <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-            <h3 className="font-semibold mb-3">✨ Gerador de Prompts</h3>
-            <p className="text-gray-400 text-sm mb-3">Use <code className="text-amber-400">/ouro:prompt "texto"</code> no terminal para gerar prompts otimizados.</p>
-            <p className="text-gray-500 text-xs">Versão web interativa será adicionada em breve.</p>
+            <Panel className="lg:col-span-2">
+              <SectionTitle>🍩 Distribuição IAs</SectionTitle>
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie data={d.distribuicaoIA} cx="50%" cy="50%" outerRadius={75} innerRadius={40} dataKey="valor" nameKey="nome" paddingAngle={3} strokeWidth={0}>
+                    {d.distribuicaoIA.map((e, i) => <Cell key={i} fill={e.cor} />)}
+                  </Pie>
+                  <Tooltip content={({active,payload}) => active && payload?.[0] ? (
+                    <div className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 shadow-xl">
+                      <p className="text-xs font-mono" style={{color:payload[0].payload.cor}}>{payload[0].name}: {payload[0].value}%</p>
+                    </div>
+                  ) : null} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex flex-wrap gap-3 justify-center mt-2">
+                {d.distribuicaoIA.map((ia, i) => (
+                  <div key={i} className="flex items-center gap-1.5 text-xs text-zinc-400">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{background:ia.cor}}></div>
+                    {ia.nome}: {ia.valor}%
+                  </div>
+                ))}
+              </div>
+            </Panel>
           </div>
-          {prompts.length > 0 && (
-            <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-              <h3 className="font-semibold mb-3">📋 Histórico</h3>
-              {prompts.map((p, i) => (
-                <div key={i} className="border-b border-gray-800/50 py-2 text-sm">
-                  <span className="text-gray-500">{p.timestamp}</span>
-                  <span className="ml-2 text-gray-300">{p.input_usuario}</span>
-                  <span className="ml-2 text-amber-400">{p.resultado === 'sucesso_primeira_tentativa' ? '✅' : '⚠️'}</span>
+
+          {/* Timeline */}
+          <Panel>
+            <SectionTitle>🗺️ Timeline do Projeto</SectionTitle>
+            <div className="space-y-3">
+              {d.fases.map((f, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <div className="w-28 text-xs text-zinc-400 font-medium shrink-0">Fase {i+1}</div>
+                  <div className="flex-1">
+                    <div className="phase-bar">
+                      <div className="phase-fill" style={{
+                        width: `${f.progresso}%`,
+                        background: f.status==='done' ? '#22c55e' : f.status==='current' ? '#f59e0b' : '#3f3f46'
+                      }}></div>
+                    </div>
+                  </div>
+                  <div className="w-32 text-xs shrink-0">
+                    {f.status==='done' && <span className="text-emerald-400">✅ {f.nome}</span>}
+                    {f.status==='current' && <span className="text-ouro-400">🔄 {f.nome}</span>}
+                    {f.status==='pending' && <span className="text-zinc-500">⏳ {f.nome}</span>}
+                  </div>
+                  <div className="w-16 text-right text-xs">
+                    {f.bugs > 0 && <Badge color="red">{f.bugs} bugs</Badge>}
+                  </div>
                 </div>
               ))}
             </div>
+          </Panel>
+
+          {/* Alertas */}
+          {d.alertas.length > 0 && (
+            <Panel className="border-ouro-500/20">
+              <SectionTitle>⚠️ Alertas ({d.alertas.length} ativos)</SectionTitle>
+              <div className="space-y-2">
+                {d.alertas.map((a, i) => (
+                  <div key={i} className={`text-sm px-3 py-2 rounded-lg ${a.tipo==='warn' ? 'bg-ouro-500/5 text-ouro-300 border border-ouro-500/10' : 'bg-blue-500/5 text-blue-300 border border-blue-500/10'}`}>
+                    • {a.msg}
+                  </div>
+                ))}
+              </div>
+            </Panel>
           )}
         </div>
       );
     }
 
-    // Sessions & Quality Pages (placeholder)
-    function SessionsPage({ sessions }) {
+    // ═══════════════════════════════════════════
+    // PÁGINA 2: ECONOMIA E CUSTOS
+    // ═══════════════════════════════════════════
+    function PageCosts() {
+      const d = MOCK;
+      const maxCusto = Math.max(...d.custoIA.map(c=>c.custo), 0.01);
+      const maxTarefa = Math.max(...d.custoTarefa.map(c=>c.custo), 0.01);
       return (
-        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <h3 className="font-semibold mb-3">📅 Sessões</h3>
-          {sessions.length === 0
-            ? <p className="text-gray-400 text-sm">Nenhuma sessão registrada ainda. Use <code className="text-amber-400">/ouro:pausar</code> ao final de cada sessão.</p>
-            : sessions.map((s, i) => (
-              <div key={i} className="border-b border-gray-800/50 py-2 text-sm text-gray-300">
-                {s.timestamp} — {s.tarefas || 0} tarefas — ${(s.custo || 0).toFixed(2)}
+        <div className="space-y-6 fade-in">
+          {/* Resumo */}
+          <Panel className="glow-ouro">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-zinc-400 text-xs uppercase tracking-wide mb-1">Custo Real</div>
+                <div className="text-3xl font-bold font-mono text-ouro-400">${d.resumo.custoReal.toFixed(2)}</div>
               </div>
-            ))
-          }
-        </div>
-      );
-    }
-
-    function QualityPage({ data }) {
-      return (
-        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <h3 className="font-semibold mb-3">✅ Qualidade e Conformidade</h3>
-          <div className="mb-4">
-            <div className="text-gray-400 text-sm mb-1">Conformidade Kit Ouro</div>
-            <div className="w-full bg-gray-800 rounded-full h-4">
-              <div className="bg-amber-500 h-4 rounded-full" style={{width: `${data.conformidade || 0}%`}}></div>
+              <div>
+                <div className="text-zinc-400 text-xs uppercase tracking-wide mb-1">Se Só Claude</div>
+                <div className="text-3xl font-bold font-mono text-red-400">${d.resumo.custoHipotetico.toFixed(2)}</div>
+              </div>
+              <div>
+                <div className="text-zinc-400 text-xs uppercase tracking-wide mb-1">Você Economizou</div>
+                <div className="text-3xl font-bold font-mono text-emerald-400">${d.resumo.economiaUsd.toFixed(2)}</div>
+                <Badge color="green">{d.resumo.economia}%</Badge>
+              </div>
             </div>
-            <div className="text-right text-sm text-amber-400 mt-1">{data.conformidade || 0}%</div>
+          </Panel>
+
+          {/* Custo por IA */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Panel>
+              <SectionTitle>💳 Custo por IA</SectionTitle>
+              <div className="space-y-3">
+                {d.custoIA.sort((a,b)=>b.custo-a.custo).map((ia, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-28 text-xs text-zinc-400 shrink-0 truncate">{ia.ia}</div>
+                    <div className="flex-1 h-5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bar-fill" style={{
+                        width: ia.custo > 0 ? `${Math.max((ia.custo/maxCusto)*100, 4)}%` : '4%',
+                        background: ia.custo > 0 ? '#f59e0b' : '#22c55e'
+                      }}></div>
+                    </div>
+                    <div className="w-16 text-right text-xs font-mono">
+                      {ia.custo > 0 ? <span className="text-ouro-400">${ia.custo.toFixed(2)}</span> : <span className="text-emerald-400">grátis</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+
+            <Panel>
+              <SectionTitle>🎯 Custo por Tipo de Tarefa</SectionTitle>
+              <div className="space-y-3">
+                {d.custoTarefa.sort((a,b)=>b.custo-a.custo).map((t, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-28 text-xs text-zinc-400 shrink-0 truncate">{t.tarefa}</div>
+                    <div className="flex-1 h-5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bar-fill" style={{
+                        width: t.custo > 0 ? `${Math.max((t.custo/maxTarefa)*100, 4)}%` : '4%',
+                        background: t.custo > 0 ? '#f59e0b' : '#22c55e'
+                      }}></div>
+                    </div>
+                    <div className="w-24 text-right text-xs">
+                      <span className="font-mono">{t.custo > 0 ? `$${t.custo.toFixed(2)}` : 'grátis'}</span>
+                      <span className="text-zinc-500 ml-1">({t.ia.split(' ')[0]})</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
           </div>
-          <p className="text-gray-400 text-sm">Desvios e recomendações aparecerão aqui quando houver dados.</p>
+
+          {/* Evolução Semanal */}
+          <Panel>
+            <SectionTitle>📊 Evolução Semanal</SectionTitle>
+            <ResponsiveContainer width="100%" height={240}>
+              <AreaChart data={d.custoSemanal}>
+                <defs>
+                  <linearGradient id="gradEco" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                <XAxis dataKey="sem" tick={{fill:'#71717a',fontSize:11}} axisLine={{stroke:'#27272a'}} />
+                <YAxis tick={{fill:'#71717a',fontSize:11}} axisLine={{stroke:'#27272a'}} tickFormatter={v=>`$${v}`} />
+                <Tooltip content={<CustomTooltip/>} />
+                <Area type="monotone" dataKey="hipotetico" name="Se só Claude" stroke="#ef4444" fill="url(#gradHipo)" strokeWidth={1.5} strokeDasharray="4 4" />
+                <Area type="monotone" dataKey="real" name="Custo real" stroke="#22c55e" fill="url(#gradEco)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Panel>
+
+          {/* Projeção */}
+          <Panel className="border-emerald-500/20">
+            <SectionTitle>🔮 Projeção até Conclusão</SectionTitle>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-zinc-400 text-xs uppercase mb-1">Custo estimado total</div>
+                <div className="text-2xl font-bold font-mono text-ouro-400">$12.50</div>
+              </div>
+              <div>
+                <div className="text-zinc-400 text-xs uppercase mb-1">Custo sem Kit Ouro</div>
+                <div className="text-2xl font-bold font-mono text-red-400">$142.00</div>
+              </div>
+              <div>
+                <div className="text-zinc-400 text-xs uppercase mb-1">Economia projetada</div>
+                <div className="text-2xl font-bold font-mono text-emerald-400">$129.50</div>
+                <Badge color="green">91.2%</Badge>
+              </div>
+            </div>
+          </Panel>
         </div>
       );
     }
 
-    // Main App
-    function App() {
-      const [active, setActive] = useState('overview');
-      const [dashboard, setDashboard] = useState({});
-      const [sessions, setSessions] = useState([]);
-      const [prompts, setPrompts] = useState([]);
+    // ═══════════════════════════════════════════
+    // PÁGINA 3: PERFORMANCE DAS IAs
+    // ═══════════════════════════════════════════
+    function PageIAs() {
+      const d = MOCK;
+      return (
+        <div className="space-y-6 fade-in">
+          {/* Tabela Comparativa */}
+          <Panel>
+            <SectionTitle>📊 Tabela Comparativa</SectionTitle>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-800">
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">IA</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Chamadas</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Sucesso</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Latência</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Custo</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Desvios</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.performanceIA.map((ia, i) => (
+                    <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                      <td className="py-2.5 px-3 font-medium text-zinc-200">{ia.ia}</td>
+                      <td className="py-2.5 px-3 text-center font-mono text-zinc-300">{ia.chamadas}</td>
+                      <td className="py-2.5 px-3 text-center">
+                        <span className={`font-mono ${ia.sucesso >= 95 ? 'text-emerald-400' : ia.sucesso >= 90 ? 'text-ouro-400' : 'text-red-400'}`}>
+                          {ia.sucesso}%
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-center font-mono text-zinc-300">{ia.latencia}</td>
+                      <td className="py-2.5 px-3 text-center font-mono">
+                        {ia.custo === '$0.00' ? <span className="text-emerald-400">grátis</span> : <span className="text-ouro-400">{ia.custo}</span>}
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {ia.desvios === 0 ? <span className="text-emerald-400">0</span> : <span className="text-red-400">{ia.desvios}</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
 
-      useEffect(() => {
-        fetch(`${API}/dashboard`).then(r => r.json()).then(setDashboard).catch(() => {});
-        fetch(`${API}/sessoes`).then(r => r.json()).then(setSessions).catch(() => {});
-        fetch(`${API}/prompts`).then(r => r.json()).then(setPrompts).catch(() => {});
-      }, []);
+          {/* Melhor IA por Tarefa */}
+          <Panel>
+            <SectionTitle>🏆 Melhor IA por Tarefa (baseado em dados reais)</SectionTitle>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-800">
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">Tarefa</th>
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">Melhor IA</th>
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">2ª opção</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.melhorPorTarefa.map((t, i) => (
+                    <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                      <td className="py-2.5 px-3 text-zinc-200">{t.tarefa}</td>
+                      <td className="py-2.5 px-3"><Badge color="yellow">{t.melhor}</Badge></td>
+                      <td className="py-2.5 px-3"><Badge color="zinc">{t.segunda}</Badge></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
 
-      const pages = {
-        overview: <OverviewPage data={dashboard} />,
-        costs: <CostsPage data={dashboard} />,
-        ias: <IAsPage />,
-        prompts: <PromptsPage prompts={prompts} />,
-        sessions: <SessionsPage sessions={sessions} />,
-        quality: <QualityPage data={dashboard} />,
+          {/* Recomendações */}
+          <Panel>
+            <SectionTitle>⚠️ Recomendações Automáticas</SectionTitle>
+            <div className="space-y-3">
+              {d.recomendacoesIA.map((r, i) => (
+                <div key={i} className={`rounded-lg px-4 py-3 border ${
+                  r.tipo==='warn' ? 'bg-ouro-500/5 border-ouro-500/10' :
+                  r.tipo==='success' ? 'bg-emerald-500/5 border-emerald-500/10' :
+                  'bg-zinc-800/30 border-zinc-700/30'
+                }`}>
+                  <div className="text-sm text-zinc-200">{r.msg}</div>
+                  <div className="text-xs text-zinc-400 mt-1">→ {r.acao}</div>
+                </div>
+              ))}
+            </div>
+          </Panel>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════
+    // PÁGINA 4: GERADOR DE PROMPTS (Web)
+    // ═══════════════════════════════════════════
+    function PagePrompts() {
+      const [texto, setTexto] = useState('');
+      const [tipoTarefa, setTipoTarefa] = useState('auto');
+      const [iaDestino, setIaDestino] = useState('auto');
+      const [modo, setModo] = useState('completo');
+      const [resultado, setResultado] = useState(null);
+      const [gerando, setGerando] = useState(false);
+      const d = MOCK;
+
+      const gerarPrompt = () => {
+        if (!texto.trim()) return;
+        setGerando(true);
+        // Simulação — em produção chama POST /api/prompt
+        setTimeout(() => {
+          setResultado({
+            iaOtimizadora: 'Gemini 2.5 Pro',
+            iaDestino: tipoTarefa === 'doc' ? 'Gemini Pro' : tipoTarefa === 'debug' ? 'Claude Sonnet' : 'Codestral',
+            framework: tipoTarefa === 'debug' ? 'XML (Claude)' : 'RISE',
+            tokens: Math.floor(Math.random() * 800 + 800),
+            custo: tipoTarefa === 'debug' ? '$0.03' : '$0.00',
+            prompt: `Role: Desenvolvedor React especializado em ${texto.slice(0, 30)}...\n\nInstructions:\nCriar componente seguindo Kit Padrão Ouro do projeto.\n\n1. Usar APENAS componentes do Kit Ouro\n2. NÃO criar CSS custom — apenas TailwindCSS\n3. Seguir espaçamento: p-4 para cards, gap-6 entre seções\n4. Responsivo: mobile-first\n5. Acessibilidade: labels, aria-labels, focus states\n\nVerify:\n□ Componentes são do Kit Ouro\n□ Nenhuma classe CSS fora do padrão\n□ Responsivo em mobile (320px) e desktop (1280px)\n□ Inputs têm labels acessíveis`,
+          });
+          setGerando(false);
+        }, 1500);
+      };
+
+      const copiarPrompt = () => {
+        if (resultado) navigator.clipboard.writeText(resultado.prompt);
       };
 
       return (
-        <div className="max-w-5xl mx-auto">
-          <header className="px-4 py-4 flex items-center gap-3 border-b border-gray-800">
-            <span className="text-2xl">🏆</span>
-            <h1 className="text-lg font-bold">GSD Ouro</h1>
-            <span className="text-gray-500 text-sm">— Dashboard</span>
-            {dashboard.projeto && <span className="ml-auto text-amber-400 text-sm">{dashboard.projeto}</span>}
+        <div className="space-y-6 fade-in">
+          {/* Input */}
+          <Panel>
+            <SectionTitle>✨ O que você precisa?</SectionTitle>
+            <textarea value={texto} onChange={e => setTexto(e.target.value)}
+              placeholder='Escreva com suas palavras... ex: "preciso de um componente de upload de fotos com drag and drop e preview"'
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-sm text-zinc-200 placeholder-zinc-500 resize-none h-24 transition-all" />
+
+            <div className="flex flex-wrap gap-3 mt-3">
+              <div>
+                <label className="text-xs text-zinc-400 block mb-1">Tipo de tarefa</label>
+                <select value={tipoTarefa} onChange={e=>setTipoTarefa(e.target.value)}
+                  className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-zinc-200">
+                  <option value="auto">Auto</option><option value="code">Código</option>
+                  <option value="doc">Documentação</option><option value="debug">Debug</option>
+                  <option value="test">Teste</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-zinc-400 block mb-1">IA destino</label>
+                <select value={iaDestino} onChange={e=>setIaDestino(e.target.value)}
+                  className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-zinc-200">
+                  <option value="auto">Auto</option><option value="claude">Claude</option>
+                  <option value="codestral">Codestral</option><option value="gemini">Gemini</option>
+                  <option value="deepseek">DeepSeek</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-zinc-400 block mb-1">Modo</label>
+                <select value={modo} onChange={e=>setModo(e.target.value)}
+                  className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-zinc-200">
+                  <option value="completo">Completo</option><option value="rapido">Rápido</option>
+                  <option value="preview">Só preview</option>
+                </select>
+              </div>
+            </div>
+
+            <button onClick={gerarPrompt} disabled={gerando || !texto.trim()}
+              className="mt-4 bg-ouro-500 hover:bg-ouro-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 font-semibold px-5 py-2.5 rounded-lg text-sm transition-all">
+              {gerando ? '⏳ Gerando...' : '🚀 Gerar Prompt Otimizado'}
+            </button>
+          </Panel>
+
+          {/* Resultado */}
+          {resultado && (
+            <Panel className="glow-ouro border-ouro-500/20">
+              <SectionTitle>🔧 Resultado</SectionTitle>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                <div className="text-xs"><span className="text-zinc-500">Otimizadora:</span><br/><span className="text-zinc-300">{resultado.iaOtimizadora}</span></div>
+                <div className="text-xs"><span className="text-zinc-500">Destino:</span><br/><span className="text-ouro-400 font-medium">{resultado.iaDestino}</span></div>
+                <div className="text-xs"><span className="text-zinc-500">Framework:</span><br/><span className="text-zinc-300">{resultado.framework}</span></div>
+                <div className="text-xs"><span className="text-zinc-500">Tokens:</span><br/><span className="font-mono text-zinc-300">~{resultado.tokens}</span></div>
+                <div className="text-xs"><span className="text-zinc-500">Custo:</span><br/><span className={`font-mono ${resultado.custo === '$0.00' ? 'text-emerald-400' : 'text-ouro-400'}`}>{resultado.custo}</span></div>
+              </div>
+              <pre className="bg-zinc-950 border border-zinc-800 rounded-lg p-4 text-xs text-zinc-300 font-mono whitespace-pre-wrap overflow-auto max-h-64">{resultado.prompt}</pre>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <button onClick={copiarPrompt} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs px-3 py-1.5 rounded-lg transition-colors">✅ Copiar Prompt</button>
+                <button className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs px-3 py-1.5 rounded-lg transition-colors">📋 Copiar para Claude Code</button>
+                <button className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs px-3 py-1.5 rounded-lg transition-colors">⭐ Salvar como Template</button>
+                <button onClick={() => { setResultado(null); gerarPrompt(); }} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs px-3 py-1.5 rounded-lg transition-colors">🔄 Regenerar</button>
+              </div>
+            </Panel>
+          )}
+
+          {/* Histórico */}
+          <Panel>
+            <SectionTitle>📜 Histórico de Prompts</SectionTitle>
+            <div className="space-y-2">
+              {d.promptsHistorico.map((p, i) => (
+                <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-800/30 transition-colors">
+                  <span className="text-xs font-mono text-zinc-500 w-12 shrink-0">{p.hora}</span>
+                  <span className="text-sm text-zinc-300 flex-1 truncate">"{p.texto}"</span>
+                  <Badge color="zinc">{p.ia}</Badge>
+                  {p.resultado === 'sucesso' ? (
+                    <span className="text-xs text-emerald-400">✅ 1ª tentativa</span>
+                  ) : (
+                    <span className="text-xs text-ouro-400">⚠️ {p.tentativa}ª tentativa</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Panel>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════
+    // PÁGINA 5: HISTÓRICO DE SESSÕES
+    // ═══════════════════════════════════════════
+    function PageSessions() {
+      const d = MOCK;
+      const legendaIAs = { CS:'Claude Sonnet', CH:'Claude Haiku', CD:'Codestral', GM:'Gemini Pro', GF:'Gemini Flash', DS:'DeepSeek' };
+      return (
+        <div className="space-y-6 fade-in">
+          <Panel>
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <SectionTitle>📅 Sessões Recentes</SectionTitle>
+              <div className="flex gap-2 ml-auto">
+                <select className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-300">
+                  <option>Esta semana</option><option>Semana passada</option><option>Este mês</option><option>Tudo</option>
+                </select>
+                <select className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-300">
+                  <option>Todas as fases</option><option>Fase 6</option><option>Fase 5</option>
+                </select>
+                <select className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-300">
+                  <option>Todas IAs</option><option>Claude</option><option>Codestral</option><option>Gemini</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-800">
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">Data</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Duração</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Tarefas</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Custo</th>
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">IAs usadas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.sessoes.map((s, i) => (
+                    <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 cursor-pointer transition-colors">
+                      <td className="py-2.5 px-3 font-mono text-ouro-400 text-xs">{s.data}</td>
+                      <td className="py-2.5 px-3 text-center font-mono text-zinc-300 text-xs">{s.duracao}</td>
+                      <td className="py-2.5 px-3 text-center font-mono text-zinc-300 text-xs">{s.tarefas}</td>
+                      <td className="py-2.5 px-3 text-center font-mono text-ouro-400 text-xs">{s.custo}</td>
+                      <td className="py-2.5 px-3">
+                        <div className="flex gap-1">
+                          {s.ias.split(',').map((ia, j) => <Badge key={j} color="zinc">{ia}</Badge>)}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+
+          <Panel>
+            <SectionTitle>📖 Legenda</SectionTitle>
+            <div className="flex flex-wrap gap-4">
+              {Object.entries(legendaIAs).map(([sigla, nome]) => (
+                <div key={sigla} className="text-xs text-zinc-400">
+                  <span className="font-mono text-zinc-300">{sigla}</span> = {nome}
+                </div>
+              ))}
+            </div>
+          </Panel>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════
+    // PÁGINA 6: QUALIDADE E CONFORMIDADE
+    // ═══════════════════════════════════════════
+    function PageQuality() {
+      const d = MOCK;
+      return (
+        <div className="space-y-6 fade-in">
+          {/* Conformidade */}
+          <Panel className="glow-ouro">
+            <SectionTitle>🎯 Conformidade com Kit Ouro</SectionTitle>
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <div className="conformance-bar">
+                  <div className="conformance-fill" style={{width:`${d.resumo.qualidade}%`}}></div>
+                </div>
+              </div>
+              <div className="text-2xl font-bold font-mono text-ouro-400">{d.resumo.qualidade}%</div>
+            </div>
+          </Panel>
+
+          {/* Desvios */}
+          <Panel>
+            <SectionTitle>🔍 Desvios Encontrados</SectionTitle>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-800">
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">#</th>
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">Tipo</th>
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">IA</th>
+                    <th className="text-center py-2.5 px-3 text-zinc-400 font-medium text-xs">Fase</th>
+                    <th className="text-left py-2.5 px-3 text-zinc-400 font-medium text-xs">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.desvios.map((dv, i) => (
+                    <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                      <td className="py-2.5 px-3 font-mono text-zinc-500 text-xs">{dv.id}</td>
+                      <td className="py-2.5 px-3 text-zinc-200 text-xs">{dv.tipo}</td>
+                      <td className="py-2.5 px-3"><Badge color={dv.ia==='Claude'?'yellow':'zinc'}>{dv.ia}</Badge></td>
+                      <td className="py-2.5 px-3 text-center font-mono text-zinc-300 text-xs">{dv.fase}</td>
+                      <td className="py-2.5 px-3"><Badge color="green">✅ {dv.status}</Badge></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Padrão de Desvios */}
+            <Panel>
+              <SectionTitle>🍩 Padrão de Desvios</SectionTitle>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={d.padraoDesvios} cx="50%" cy="50%" outerRadius={70} innerRadius={35} dataKey="qtd" nameKey="tipo" paddingAngle={3} strokeWidth={0}>
+                    {d.padraoDesvios.map((e, i) => <Cell key={i} fill={e.cor} />)}
+                  </Pie>
+                  <Tooltip content={({active,payload}) => active && payload?.[0] ? (
+                    <div className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 shadow-xl">
+                      <p className="text-xs" style={{color:payload[0].payload.cor}}>{payload[0].name}: {payload[0].payload.pct}%</p>
+                    </div>
+                  ) : null} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-1.5 mt-2">
+                {d.padraoDesvios.map((p, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs">
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{background:p.cor}}></div>
+                    <span className="text-zinc-400">{p.tipo}:</span>
+                    <span className="font-mono text-zinc-300">{p.qtd} ({p.pct}%)</span>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+
+            {/* Recomendação */}
+            <Panel className="border-ouro-500/20">
+              <SectionTitle>💡 Recomendação</SectionTitle>
+              <div className="space-y-4">
+                <div className="bg-ouro-500/5 border border-ouro-500/10 rounded-lg p-4">
+                  <div className="text-sm text-ouro-300 font-medium mb-2">Reforçar regra de CSS no prompt para Codestral</div>
+                  <div className="text-xs text-zinc-400">Codestral é a principal fonte de desvios CSS (3 de 7 = 42.9%). Incluir constraint reforçada: "NÃO use CSS custom. APENAS classes do TailwindCSS listadas no KIT_OURO.md"</div>
+                </div>
+                <div className="bg-zinc-800/30 border border-zinc-700/30 rounded-lg p-4">
+                  <div className="text-sm text-zinc-300 font-medium mb-2">Monitorar DeepSeek para naming</div>
+                  <div className="text-xs text-zinc-400">DeepSeek V3 teve 2 desvios de naming. Considerar adicionar seção de naming conventions no prompt padrão.</div>
+                </div>
+                <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-4">
+                  <div className="text-sm text-emerald-300 font-medium mb-2">Claude e Gemini mantêm padrão excelente</div>
+                  <div className="text-xs text-zinc-400">Gemini Pro: 0 desvios em 78 chamadas. Claude Haiku: 0 desvios em 23 chamadas. Continuar priorizando para tarefas sensíveis.</div>
+                </div>
+              </div>
+            </Panel>
+          </div>
+        </div>
+      );
+    }
+
+    // ═══════════════════════════════════════════
+    // APP PRINCIPAL
+    // ═══════════════════════════════════════════
+    function App() {
+      const [page, setPage] = useState('overview');
+      const pages = {
+        overview: PageOverview,
+        costs: PageCosts,
+        ias: PageIAs,
+        prompts: PagePrompts,
+        sessions: PageSessions,
+        quality: PageQuality,
+      };
+      const ActivePage = pages[page];
+
+      return (
+        <div className="min-h-screen">
+          {/* Header */}
+          <header className="px-6 py-4 border-b border-zinc-800/80 flex items-center justify-between bg-zinc-950">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ouro-400 to-ouro-600 flex items-center justify-center text-sm font-bold text-zinc-900">🏆</div>
+              <div>
+                <h1 className="text-lg font-bold text-zinc-100">GSD OURO</h1>
+                <p className="text-xs text-zinc-500">{MOCK.projeto.nome} — {MOCK.projeto.descricao}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge color="yellow">Sessão #{MOCK.projeto.sessaoAtual}</Badge>
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+              <span className="text-xs text-zinc-500">Ativo</span>
+            </div>
           </header>
-          <Nav active={active} setActive={setActive} />
-          <main className="p-4">
-            {pages[active]}
+
+          {/* Navigation */}
+          <Nav active={page} setActive={setPage} />
+
+          {/* Content */}
+          <main className="max-w-7xl mx-auto px-6 py-6">
+            <ActivePage />
           </main>
-          <footer className="text-center text-gray-600 text-xs py-4 border-t border-gray-800">
-            GSD Ouro v0.1 — Kit Padrão Ouro
+
+          {/* Footer */}
+          <footer className="text-center py-4 text-xs text-zinc-600 border-t border-zinc-800/50">
+            GSD Ouro v0.1 — Dashboard Web — Dados {MOCK.projeto.sessaoAtual > 0 ? 'de demonstração' : 'reais'} — localhost:3333
           </footer>
         </div>
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    ReactDOM.render(<App />, document.getElementById('root'));
   </script>
 </body>
 </html>
