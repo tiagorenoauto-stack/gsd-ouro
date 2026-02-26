@@ -30,7 +30,15 @@
       "Bash(xargs kill -9)",
       "Bash(netstat -ano)",
       "Read(//c/Users/tiago/AppGSD-Ouro/gsd-ouro/**)",
-      "Bash(curl -s http://localhost:3333/)"
+      "Bash(curl -s http://localhost:3333/)",
+      "Bash(xargs wc -l)",
+      "WebFetch(domain:goatimus.com)",
+      "WebFetch(domain:perfectpromptgenerator.ai)",
+      "WebFetch(domain:gudprompt.com)",
+      "WebFetch(domain:promptweaver.me)",
+      "WebFetch(domain:www.feedough.com)",
+      "WebFetch(domain:developers.openai.com)",
+      "WebFetch(domain:www.getguru.com)"
     ]
   }
 }
