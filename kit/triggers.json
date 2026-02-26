@@ -1,0 +1,216 @@
+{
+  "version": "0.6.0",
+  "description": "Mapeamento de keywords/contextos para padroes do Kit Ouro. O trigger-engine usa este arquivo para detectar QUANDO injetar cada padrao no contexto do prompt.",
+  "triggers": [
+    {
+      "id": "confirm-before-code",
+      "pattern_file": "kit/padroes/confirm-before-code.md",
+      "keywords": ["sempre-ativo"],
+      "contexts": ["executar", "planejar", "rapido", "debug", "verificar", "novo-projeto"],
+      "priority": 0,
+      "auto_inject": false,
+      "checklist": "confirm-before-code",
+      "always_active": true
+    },
+    {
+      "id": "golden-model",
+      "pattern_file": "kit/padroes/golden-model.md",
+      "keywords": ["criar pagina", "novo formulario", "FormPage", "replicar modelo", "FormPageShell", "novo modulo", "pagina de cadastro", "form page"],
+      "contexts": ["executar", "planejar", "rapido"],
+      "priority": 1,
+      "auto_inject": true,
+      "checklist": "golden-model"
+    },
+    {
+      "id": "5-layer-field",
+      "pattern_file": "kit/padroes/5-layer-field-rule.md",
+      "keywords": ["novo campo", "adicionar campo", "field", "whitelist", "dado nao salva", "campo sumindo", "migration", "dto", "column", "propriedade nova"],
+      "contexts": ["executar", "rapido", "debug"],
+      "priority": 1,
+      "auto_inject": true,
+      "checklist": "5-layer-field"
+    },
+    {
+      "id": "fastfill",
+      "pattern_file": "kit/padroes/fastfill.md",
+      "keywords": ["preenchimento automatico", "auto-fill", "sugestao campo", "fastfill", "groq", "micro-especialista", "FormFiller"],
+      "contexts": ["executar", "planejar"],
+      "priority": 2,
+      "auto_inject": false,
+      "checklist": "fastfill"
+    },
+    {
+      "id": "entity-linker",
+      "pattern_file": "kit/padroes/entity-linker.md",
+      "keywords": ["entity linker", "linking", "cross-module", "relacionamento", "referencia entre", "vincular", "associar", "link entre"],
+      "contexts": ["executar", "planejar"],
+      "priority": 2,
+      "auto_inject": true,
+      "checklist": "entity-linker"
+    },
+    {
+      "id": "form-unificado",
+      "pattern_file": "kit/padroes/form-unificado.md",
+      "keywords": ["nova pagina", "list page", "form page", "criar modulo", "estrutura modulo", "novo grupo", "DetailPage"],
+      "contexts": ["planejar", "executar"],
+      "priority": 1,
+      "auto_inject": true,
+      "checklist": "form-unificado"
+    },
+    {
+      "id": "hierarquia",
+      "pattern_file": "kit/padroes/hierarquia-4-niveis.md",
+      "keywords": ["modulo", "grupo", "unidade", "categoria", "hierarquia", "estrutura", "organizacao", "moduleId", "groupId"],
+      "contexts": ["planejar", "novo-projeto"],
+      "priority": 1,
+      "auto_inject": true,
+      "checklist": null
+    },
+    {
+      "id": "componentes",
+      "pattern_file": "kit/padroes/componentes-obrigatorios.md",
+      "keywords": ["componente", "component", "shell", "filler", "kit ouro", "tab bar", "currency", "select", "photo", "document"],
+      "contexts": ["executar", "verificar"],
+      "priority": 1,
+      "auto_inject": false,
+      "checklist": "componentes-10"
+    },
+    {
+      "id": "naming",
+      "pattern_file": "kit/padroes/naming-conventions.md",
+      "keywords": ["nome", "naming", "convencao", "snake_case", "camelCase", "PascalCase", "renomear", "nome arquivo"],
+      "contexts": ["verificar", "executar"],
+      "priority": 3,
+      "auto_inject": false,
+      "checklist": null
+    },
+    {
+      "id": "agentes",
+      "pattern_file": "kit/padroes/agentes-arquetipos.md",
+      "keywords": ["agente", "arquiteto", "designer", "auditor", "debugger", "scrum", "5 porques", "revisao", "sprint"],
+      "contexts": ["planejar", "executar"],
+      "priority": 2,
+      "auto_inject": false,
+      "checklist": null
+    },
+    {
+      "id": "salvaguardas",
+      "pattern_file": "kit/padroes/salvaguardas.md",
+      "keywords": ["backup", "scope", "dependencias", "build check", "deploy", "producao", "critico", "migration", "auth", "pagamento"],
+      "contexts": ["executar", "verificar"],
+      "priority": 1,
+      "auto_inject": true,
+      "checklist": "salvaguardas"
+    },
+    {
+      "id": "git",
+      "pattern_file": "kit/padroes/git-standards.md",
+      "keywords": ["commit", "git", "branch", "merge", "push", "pull request", "PR"],
+      "contexts": ["executar"],
+      "priority": 2,
+      "auto_inject": false,
+      "checklist": null
+    },
+    {
+      "id": "checklists",
+      "pattern_file": "kit/padroes/checklists-qualidade.md",
+      "keywords": ["checklist", "qualidade", "verificacao", "conformidade", "auditoria", "review"],
+      "contexts": ["verificar"],
+      "priority": 1,
+      "auto_inject": true,
+      "checklist": "qualidade"
+    },
+    {
+      "id": "ui-standards",
+      "pattern_file": "kit/padroes/ui-standards.md",
+      "keywords": ["cor", "gradiente", "botao", "spacing", "design", "layout", "dark mode", "palette", "estilo", "visual", "tailwind"],
+      "contexts": ["executar"],
+      "priority": 2,
+      "auto_inject": false,
+      "checklist": null
+    },
+    {
+      "id": "error-patterns",
+      "pattern_file": "kit/padroes/error-patterns.md",
+      "keywords": ["whitelist", "401", "429", "Object.assign", "dark mode bug", "erro conhecido", "bug conhecido", "dado sumindo", "rate limit"],
+      "contexts": ["debug", "rapido"],
+      "priority": 1,
+      "auto_inject": true,
+      "checklist": null
+    }
+  ],
+  "checklists": {
+    "golden-model": [
+      "FormPageShell como wrapper",
+      "Tabs ordenadas (Identificacao primeiro)",
+      "mapServerToForm em arquivo separado",
+      "EntityLinker configurado",
+      "useFormFiller integrado",
+      "Schema Zod para validacao",
+      "Max 2 paginas no modulo"
+    ],
+    "5-layer-field": [
+      "Entity @Column com tipo correto",
+      "Migration ALTER TABLE criada",
+      "DTO @IsOptional() + decorator de tipo",
+      "Schema Zod com validacao",
+      "Form UI com componente correto",
+      "Teste: salvar, recarregar, dado persiste"
+    ],
+    "fastfill": [
+      "useFormFiller hook integrado",
+      "FormFillerNameInput como campo titulo",
+      "FormFillerSlots renderizados",
+      "Groq API key configurada",
+      "Fallback chain implementada"
+    ],
+    "entity-linker": [
+      "Controller @Get() retorna {data: [{id,name}]}",
+      "entityType e moduleId definidos no config",
+      "Tab de links NAO criada manualmente",
+      "syncLinks chamado no afterSave"
+    ],
+    "form-unificado": [
+      "Max 2 paginas no modulo (List + Form)",
+      "ListPage com filtros e batch actions",
+      "FormPage com FormPageShell",
+      "Deteccao automatica de modo (new vs edit)",
+      "Nenhuma DetailPage existe"
+    ],
+    "componentes-10": [
+      "FormPageShell",
+      "EntityLinker",
+      "FormTabBar pill-style",
+      "CollapsibleCategories",
+      "CurrencyInput para valores",
+      "TypeSelect para selects",
+      "PhotoCarousel + PhotoManager",
+      "DocumentManager",
+      "useFormFiller integrado",
+      "TailwindCSS + dark: em tudo"
+    ],
+    "salvaguardas": [
+      "Backup commit antes da mudanca",
+      "Scope dos arquivos listado e aprovado",
+      "Dependencias verificadas",
+      "Build limpo ANTES",
+      "Build limpo DEPOIS"
+    ],
+    "confirm-before-code": [
+      "Bloco CONFIRM apresentado",
+      "Interpretacao validada pelo usuario",
+      "Timing verificado (fase atual vs pedido)",
+      "Batching verificado (pedidos relacionados)",
+      "Viabilidade avaliada (tecnica + tokens + risco)",
+      "Opcoes apresentadas com recomendacao",
+      "Autorizacao explicita recebida"
+    ],
+    "qualidade": [
+      "5 camadas de campo completas",
+      "Componentes Kit Ouro usados",
+      "Naming conventions corretas",
+      "Dark mode em todos elementos",
+      "Build limpo sem erros"
+    ]
+  }
+}

@@ -18,12 +18,33 @@ Claude faz tudo por padrão (já pago no plano). Providers externos são opciona
 
 ## Loop de Execução
 
-Para toda tarefa, siga: **MATCH → DIFF → GENERATE → UPDATE**
+Para toda tarefa, siga: **MATCH → DIFF → CONFIRM → GENERATE → UPDATE**
 
 1. **MATCH** — Verificar no `.ouro/KIT_OURO.md` se componente/padrão existe
 2. **DIFF** — Comparar o que existe com o que precisa
-3. **GENERATE** — Gerar código (ver modo de operação abaixo)
-4. **UPDATE** — Atualizar KIT_OURO.md se criou padrão novo + atualizar STATE.md
+3. **CONFIRM** — Apresentar bloco CONFIRM ao usuário (ver abaixo). **NUNCA pular este passo.**
+4. **GENERATE** — Gerar código somente após autorização explícita
+5. **UPDATE** — Atualizar KIT_OURO.md se criou padrão novo + atualizar STATE.md
+
+## CONFIRM — Confirmar Antes de Codificar (Obrigatório)
+
+**NUNCA** comece a codificar sem apresentar o bloco CONFIRM e receber autorização.
+
+Antes de gerar qualquer código, apresentar:
+
+1. **Interpretação** — "Entendi que você quer: [X]". Escopo: arquivos/módulos afetados.
+2. **Timing** — Fase atual e progresso. É oportuno agora ou devemos finalizar a fase atual primeiro? Se não for oportuno → registrar pedido para depois.
+3. **Batching** — Há pedidos pendentes relacionados? Se sim, sugerir agrupar para tocar cada arquivo 1x só.
+4. **Viabilidade** — Técnica (Alta/Média/Baixa) + Custo estimado de tokens + Risco de quebrar algo existente.
+5. **Opções** — Mínimo 2 alternativas com prós/contras. Marcar a recomendada.
+6. **Riscos** — O que pode dar errado.
+7. **Recomendação** — Ação sugerida clara.
+
+Finalizar com: `Autoriza? (opção / ajustar / adiar)`
+
+**Exceções** (pode pular CONFIRM): correções de typo, perguntas informativas, leitura de arquivos.
+
+**Ref:** [kit/padroes/confirm-before-code.md](kit/padroes/confirm-before-code.md)
 
 ## Modos de Operação
 
@@ -76,5 +97,6 @@ Ao trabalhar em um projeto que usa GSD Ouro, os seguintes arquivos estarão em `
 2. **Referências > cópia** — Referencie o Kit em vez de repetir conteúdo.
 3. **Pergunte antes de criar** — Se algo não existe no Kit, confirme antes.
 4. **Registre tudo** — Toda tarefa gera entrada em analytics/.
-5. **Respeite o fluxo** — MATCH → DIFF → GENERATE → UPDATE. Sempre.
-6. **Skills são autônomas** — Cada skill sabe qual provider/modelo usar.
+5. **Respeite o fluxo** — MATCH → DIFF → CONFIRM → GENERATE → UPDATE. Sempre.
+6. **CONFIRM obrigatório** — NUNCA codifique sem apresentar interpretação + viabilidade + opções e receber autorização.
+7. **Skills são autônomas** — Cada skill sabe qual provider/modelo usar.

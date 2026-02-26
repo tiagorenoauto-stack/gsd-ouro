@@ -1,6 +1,11 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "modo": "claude",
+  "triggers": {
+    "enabled": true,
+    "auto_inject": true,
+    "max_patterns": 3
+  },
   "provedores_externos": {
     "mistral": {
       "endpoint": "https://api.mistral.ai/v1/chat/completions",
