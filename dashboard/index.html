@@ -96,6 +96,37 @@
     .em { text-align:center; padding:28px 16px; color:#3f3f46; font-size:13px; }
     .em small { color:#27272a; font-size:11px; display:block; margin-top:6px; }
 
+    /* Chat tab */
+    nav button[data-pg="chat"].active { color:#22d3ee; border-bottom-color:#22d3ee; }
+    .chat-msg { padding:8px 12px; margin-bottom:6px; border-radius:8px; font-size:13px; line-height:1.5; }
+    .chat-user { background:#1a1a2e; border:1px solid #27272a; text-align:right; }
+    .chat-ai { background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.15); }
+    .chat-ai .chat-label { color:#22d3ee; font-size:10px; font-weight:600; text-transform:uppercase; margin-bottom:2px; }
+    .chat-user .chat-label { color:#71717a; font-size:10px; font-weight:600; text-transform:uppercase; margin-bottom:2px; text-align:right; }
+
+    /* Notes */
+    .note-item { padding:10px 14px; border:1px solid #27272a; border-radius:8px; margin-bottom:6px; background:#18181b; display:flex; gap:10px; align-items:flex-start; }
+    .note-item:hover { border-color:#3f3f46; }
+    .note-text { flex:1; font-size:13px; line-height:1.4; }
+    .note-tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
+    .note-tag { font-size:9px; padding:1px 6px; border-radius:999px; background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid rgba(251,191,36,0.15); }
+    .note-tag.t-bug { background:rgba(239,68,68,0.1); color:#f87171; border-color:rgba(239,68,68,0.15); }
+    .note-tag.t-feature { background:rgba(59,130,246,0.1); color:#60a5fa; border-color:rgba(59,130,246,0.15); }
+    .note-tag.t-idea { background:rgba(168,85,247,0.1); color:#c084fc; border-color:rgba(168,85,247,0.15); }
+    .note-tag.t-ui { background:rgba(34,211,238,0.1); color:#22d3ee; border-color:rgba(34,211,238,0.15); }
+    .note-prio { font-size:10px; font-weight:600; flex-shrink:0; }
+    .prio-high { color:#f87171; }
+    .prio-medium { color:#fbbf24; }
+    .prio-low { color:#71717a; }
+    .note-actions { display:flex; gap:4px; flex-shrink:0; }
+    .note-actions button { background:none; border:1px solid #27272a; color:#71717a; font-size:10px; padding:2px 6px; border-radius:4px; cursor:pointer; }
+    .note-actions button:hover { color:#e4e4e7; border-color:#52525b; }
+
+    /* Updates */
+    .upd-item { padding:12px 16px; border-left:3px solid #fbbf24; background:#18181b; border-radius:0 8px 8px 0; margin-bottom:8px; }
+    .upd-item.t-hotfix { border-left-color:#f87171; }
+    .upd-item.t-patch { border-left-color:#60a5fa; }
+
     /* Mode indicator */
     .mode-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:999px; font-size:11px; font-weight:600; }
     .mode-claude { background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid rgba(251,191,36,0.2); }
@@ -179,6 +210,9 @@
   <button data-pg="sessions">Sessoes</button>
   <button data-pg="quality">Qualidade</button>
   <button data-pg="intelligence" style="color:#6366f1">Inteligencia</button>
+  <button data-pg="chat" style="color:#22d3ee">Chat</button>
+  <button data-pg="notes">Notas</button>
+  <button data-pg="updates">Updates</button>
 </nav>
 
 <main class="sp">
@@ -349,8 +383,109 @@
   </div>
 </div>
 
+<!-- ═══ CHAT INTERATIVO ═══ -->
+<div id="p-chat" class="pg sp">
+  <div class="g2">
+    <div class="c" style="border-color:rgba(34,211,238,0.2)">
+      <h2 style="color:#22d3ee">Chat — Linguagem Natural para Prompt</h2>
+      <div id="chat-messages" style="min-height:280px;max-height:400px;overflow-y:auto;margin-bottom:12px;padding:8px;background:#09090b;border-radius:8px;border:1px solid #27272a">
+        <div class="em" id="chat-empty">Escreva o que voce quer em linguagem natural.<br><small>Ex: "quero um botao de logout bonito no header"</small></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <textarea id="chatIn" placeholder="Descreva o que voce quer..." style="height:44px;flex:1"></textarea>
+        <button class="btn btn-gold" onclick="sendChat()" style="white-space:nowrap">Enviar</button>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn-sm" onclick="clearChat()">Limpar</button>
+        <span id="chat-status" style="font-size:11px;color:#52525b;line-height:32px;margin-left:8px"></span>
+      </div>
+    </div>
+    <div class="c">
+      <h2>Prompt Gerado</h2>
+      <pre class="result" id="chat-prompt" style="min-height:280px">Nenhum prompt gerado ainda.
+Converse no chat para gerar um prompt CO-STAR profissional.</pre>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn-sm" onclick="copyChatPrompt()">Copiar</button>
+        <button class="btn-sm" onclick="saveChatPrompt()">Salvar</button>
+      </div>
+    </div>
+  </div>
+  <div class="c" style="margin-top:16px">
+    <h2>Configuracao do Chat</h2>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:12px;color:#71717a;display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="chat-confirm-toggle" onchange="toggleConfirm()" checked>
+        <span>CONFIRM Before Code ativo</span>
+      </label>
+      <span style="font-size:11px;color:#3f3f46" id="confirm-status">Padrao: ON — Bloco CONFIRM obrigatorio antes de codificar</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NOTAS ═══ -->
+<div id="p-notes" class="pg sp">
+  <div class="g53">
+    <div class="c">
+      <h2>Notas</h2>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <textarea id="noteIn" placeholder="Escreva sua ideia, bug, feature..." style="height:44px;flex:1"></textarea>
+        <button class="btn btn-gold" onclick="addNote()" style="white-space:nowrap">+ Nota</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn-sm" onclick="filterNotes()" data-nf="all" style="background:#3f3f46">Todas</button>
+        <button class="btn-sm" onclick="filterNotes('high')">Urgentes</button>
+        <button class="btn-sm" onclick="filterNotes('open')">Abertas</button>
+        <button class="btn-sm" onclick="filterNotes('done')">Feitas</button>
+      </div>
+      <div id="notes-list" style="max-height:400px;overflow-y:auto">
+        <div class="em">Nenhuma nota. Adicione sua primeira ideia!</div>
+      </div>
+    </div>
+    <div class="c">
+      <h2>Estatisticas</h2>
+      <div id="notes-stats" class="sp">
+        <div class="em">Sem dados</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ UPDATES ═══ -->
+<div id="p-updates" class="pg sp">
+  <div class="c" style="border-color:rgba(251,191,36,0.2)">
+    <h2>Historico de Atualizacoes — GSD Ouro</h2>
+    <div id="updates-list" class="sp">
+      <div class="em">Carregando historico...</div>
+    </div>
+  </div>
+  <div class="g2" style="margin-top:16px">
+    <div class="c">
+      <h2>Registrar Atualizacao</h2>
+      <div class="sp">
+        <input type="text" id="upd-version" placeholder="Versao (ex: 0.7.0)" style="width:100%;background:#1a1a1e;border:1px solid #27272a;border-radius:8px;padding:8px 12px;color:#e4e4e7;font-size:13px;font-family:inherit">
+        <textarea id="upd-desc" placeholder="Descricao da atualizacao..." style="height:60px"></textarea>
+        <div style="display:flex;gap:8px">
+          <select id="upd-type" style="flex:1">
+            <option value="release">Release</option>
+            <option value="hotfix">Hotfix</option>
+            <option value="patch">Patch</option>
+            <option value="update">Update</option>
+          </select>
+          <button class="btn btn-gold" onclick="logUpdate()">Registrar</button>
+        </div>
+      </div>
+    </div>
+    <div class="c">
+      <h2>Resumo</h2>
+      <div id="updates-summary" class="sp">
+        <div class="em">Sem dados</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
-<footer>GSD Ouro v0.5 — Dashboard Adaptativo — Modo <span id="ft-mode">claude</span></footer>
+<footer>GSD Ouro v0.7 — Dashboard Adaptativo — Modo <span id="ft-mode">claude</span></footer>
 
 <script>
 /* ── State ── */
@@ -812,8 +947,202 @@ function gerarPrompt(){
   },1000);
 }
 
+/* ── Chat Engine ── */
+var CHAT_HISTORY=[];
+
+function sendChat(){
+  var msg=$('chatIn').value.trim();if(!msg)return;
+  $('chatIn').value='';
+  $('chat-empty')&&($('chat-empty').style.display='none');
+  appendChat('user',msg);
+  $('chat-status').textContent='Processando...';
+
+  fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:CHAT_HISTORY})})
+  .then(function(r){return r.json()})
+  .then(function(data){
+    $('chat-status').textContent='';
+    if(!data.ok){appendChat('ai','Erro: '+(data.error||'desconhecido'));return;}
+    var result=data.data;
+    CHAT_HISTORY.push({role:'user',content:msg,interpretation:result.interpretation||null});
+
+    if(result.type==='interpretation'){
+      appendChat('ai','Entendi: "'+result.interpretation.summary+'".\n\n'+result.suggestions.join('\n'));
+    }else if(result.type==='prompt_generated'){
+      appendChat('ai','Prompt CO-STAR gerado!\nTriggers: '+(result.prompt.triggers||[]).join(', '));
+      var p=result.prompt;
+      $('chat-prompt').textContent='[CO-STAR Framework]\n\nContext: '+p.context+'\nObjective: '+p.objective+'\nStyle: '+p.style+'\nTone: '+p.tone+'\nAudience: '+p.audience+'\nResponse: '+p.response+(p.triggerContext?'\n\n'+p.triggerContext:'');
+    }else if(result.type==='correction_needed'){
+      appendChat('ai',result.message);
+    }else if(result.type==='note'){
+      appendChat('ai',result.message);
+    }else if(result.type==='question'){
+      appendChat('ai',result.message);
+    }else{
+      appendChat('ai',result.message||JSON.stringify(result));
+    }
+  })
+  .catch(function(e){
+    $('chat-status').textContent='';
+    appendChat('ai','Erro de conexao: '+e.message);
+  });
+}
+
+function appendChat(role,text){
+  var box=$('chat-messages');
+  var div=document.createElement('div');
+  div.className='chat-msg chat-'+role;
+  div.innerHTML='<div class="chat-label">'+(role==='user'?'Voce':'GSD Ouro')+'</div><div>'+text.replace(/\n/g,'<br>')+'</div>';
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+}
+
+function clearChat(){
+  CHAT_HISTORY=[];
+  $('chat-messages').innerHTML='<div class="em" id="chat-empty">Escreva o que voce quer em linguagem natural.<br><small>Ex: "quero um botao de logout bonito no header"</small></div>';
+  $('chat-prompt').textContent='Nenhum prompt gerado ainda.\nConverse no chat para gerar um prompt CO-STAR profissional.';
+  fetch('/api/chat/clear',{method:'POST'});
+}
+
+function copyChatPrompt(){
+  var text=$('chat-prompt').textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    $('chat-status').textContent='Copiado!';
+    setTimeout(function(){$('chat-status').textContent=''},2000);
+  });
+}
+
+function saveChatPrompt(){
+  var text=$('chat-prompt').textContent;
+  if(text.indexOf('Nenhum')===0)return;
+  fetch('/api/track/prompt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:text,source:'chat',grade:'B'})})
+  .then(function(){$('chat-status').textContent='Salvo!';setTimeout(function(){$('chat-status').textContent=''},2000)});
+}
+
+function toggleConfirm(){
+  var on=$('chat-confirm-toggle').checked;
+  $('confirm-status').textContent=on?'Padrao: ON — Bloco CONFIRM obrigatorio antes de codificar':'DESLIGADO — Cuidado: codificacao sem confirmacao';
+  $('confirm-status').style.color=on?'#3f3f46':'#f87171';
+  fetch('/api/preferences',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirm_enabled:on})});
+}
+
+$('chatIn').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
+
+/* ── Notes Engine ── */
+var NOTES=[];
+var NOTE_FILTER=null;
+
+function loadNotes(){
+  fetch('/api/notes').then(function(r){return r.json()}).then(function(data){
+    NOTES=data||[];
+    renderNotes();
+    renderNoteStats();
+  }).catch(function(){});
+}
+
+function addNote(){
+  var text=$('noteIn').value.trim();if(!text)return;
+  $('noteIn').value='';
+  fetch('/api/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})})
+  .then(function(r){return r.json()})
+  .then(function(data){
+    if(data.ok){loadNotes();}
+  });
+}
+
+function filterNotes(f){
+  NOTE_FILTER=f||null;
+  document.querySelectorAll('[data-nf]').forEach(function(b){b.style.background='';});
+  if(!f){document.querySelector('[data-nf="all"]').style.background='#3f3f46';}
+  renderNotes();
+}
+
+function noteAction(id,action){
+  if(action==='delete'){
+    fetch('/api/notes/'+id,{method:'DELETE'}).then(function(){loadNotes()});
+  }else{
+    fetch('/api/notes/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:action})})
+    .then(function(){loadNotes()});
+  }
+}
+
+function renderNotes(){
+  var filtered=NOTES;
+  if(NOTE_FILTER==='high')filtered=NOTES.filter(function(n){return n.priority==='high'});
+  if(NOTE_FILTER==='open')filtered=NOTES.filter(function(n){return n.status==='open'});
+  if(NOTE_FILTER==='done')filtered=NOTES.filter(function(n){return n.status==='done'});
+
+  if(!filtered.length){
+    $('notes-list').innerHTML='<div class="em">Nenhuma nota'+(NOTE_FILTER?' com este filtro':'')+'.</div>';
+    return;
+  }
+  $('notes-list').innerHTML=filtered.map(function(n){
+    var tagCls={'bug':'t-bug','feature':'t-feature','idea':'t-idea','ui':'t-ui'};
+    var tags=(n.tags||[]).map(function(t){return '<span class="note-tag '+(tagCls[t]||'')+'">'+t+'</span>'}).join('');
+    var prioIcon={'high':'!!','medium':'!','low':'~'};
+    var statusIcon=n.status==='done'?'<span style="color:#4ade80;font-size:11px">done</span>':n.status==='deferred'?'<span style="color:#71717a;font-size:11px">adiada</span>':'';
+    return '<div class="note-item"><span class="note-prio prio-'+(n.priority||'medium')+'">'+(prioIcon[n.priority]||'!')+'</span><div class="note-text">'+n.text+'<div class="note-tags">'+tags+(n.module?'<span class="note-tag">'+n.module+'</span>':'')+'</div></div>'+statusIcon+'<div class="note-actions"><button onclick="noteAction(\''+n.id+'\',\'done\')" title="Concluir">ok</button><button onclick="noteAction(\''+n.id+'\',\'deferred\')" title="Adiar">adiar</button><button onclick="noteAction(\''+n.id+'\',\'delete\')" title="Remover">x</button></div></div>';
+  }).join('');
+}
+
+function renderNoteStats(){
+  if(!NOTES.length){$('notes-stats').innerHTML='<div class="em">Sem dados</div>';return;}
+  var stats={total:NOTES.length,open:0,done:0,deferred:0,high:0,medium:0,low:0,tags:{}};
+  NOTES.forEach(function(n){
+    stats[n.status||'open']++;
+    stats[n.priority||'medium']++;
+    (n.tags||[]).forEach(function(t){stats.tags[t]=(stats.tags[t]||0)+1});
+  });
+  var tagList=Object.keys(stats.tags).sort(function(a,b){return stats.tags[b]-stats.tags[a]}).slice(0,8);
+  $('notes-stats').innerHTML=
+    '<div class="g3c"><div><div class="big mono" style="font-size:20px;color:#fbbf24">'+stats.total+'</div><div class="sub">Total</div></div><div><div class="big mono" style="font-size:20px;color:#4ade80">'+stats.done+'</div><div class="sub">Feitas</div></div><div><div class="big mono" style="font-size:20px;color:#f87171">'+stats.high+'</div><div class="sub">Urgentes</div></div></div>'+
+    '<div style="margin-top:16px"><h2 style="font-size:12px;color:#71717a;margin-bottom:8px">Por Status</h2>'+
+    '<div class="bar-t" style="margin-bottom:4px"><div class="bar-f" style="width:'+((stats.done/stats.total)*100)+'%;background:linear-gradient(90deg,#4ade80,#22c55e)"></div></div>'+
+    '<div style="font-size:11px;color:#52525b">'+stats.open+' abertas / '+stats.done+' feitas / '+stats.deferred+' adiadas</div></div>'+
+    '<div style="margin-top:16px"><h2 style="font-size:12px;color:#71717a;margin-bottom:8px">Tags</h2>'+
+    tagList.map(function(t){return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span style="color:#a1a1aa">'+t+'</span><span class="mono" style="color:#fbbf24">'+stats.tags[t]+'</span></div>'}).join('')+'</div>';
+}
+
+/* ── Updates ── */
+var UPDATES=[];
+
+function loadUpdates(){
+  fetch('/api/updates').then(function(r){return r.json()}).then(function(data){
+    UPDATES=data||[];
+    renderUpdates();
+  }).catch(function(){});
+}
+
+function logUpdate(){
+  var ver=$('upd-version').value.trim();
+  var desc=$('upd-desc').value.trim();
+  var type=$('upd-type').value;
+  if(!ver||!desc)return;
+  fetch('/api/updates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({version:ver,description:desc,type:type})})
+  .then(function(r){return r.json()})
+  .then(function(data){
+    if(data.ok){$('upd-version').value='';$('upd-desc').value='';loadUpdates();}
+  });
+}
+
+function renderUpdates(){
+  if(!UPDATES.length){
+    $('updates-list').innerHTML='<div class="em">Nenhuma atualizacao registrada.</div>';
+    $('updates-summary').innerHTML='<div class="em">Sem dados</div>';
+    return;
+  }
+  $('updates-list').innerHTML=UPDATES.slice(0,20).map(function(u){
+    return '<div class="upd-item t-'+(u.type||'update')+'"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:600;color:#fbbf24" class="mono">v'+(u.version||'?')+'</span><span style="font-size:11px;color:#52525b">'+(u.date||'')+'</span></div><div style="font-size:13px;margin-top:4px;color:#a1a1aa">'+(u.description||'')+'</div><div style="margin-top:4px"><span class="b b-'+(u.type==='hotfix'?'r':u.type==='patch'?'b':'y')+'">'+(u.type||'update')+'</span></div></div>';
+  }).join('');
+
+  var versions=[...new Set(UPDATES.map(function(u){return u.version}))];
+  $('updates-summary').innerHTML=
+    '<div class="g3c"><div><div class="big mono" style="font-size:20px;color:#fbbf24">'+UPDATES.length+'</div><div class="sub">Total</div></div><div><div class="big mono" style="font-size:20px;color:#e4e4e7">'+versions.length+'</div><div class="sub">Versoes</div></div><div><div class="big mono" style="font-size:20px;color:#4ade80">v'+(UPDATES[0].version||'?')+'</div><div class="sub">Atual</div></div></div>';
+}
+
 /* ── Init ── */
 load();
+loadNotes();
+loadUpdates();
 setInterval(load,30000);
 </script>
 </body>

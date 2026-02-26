@@ -1,10 +1,18 @@
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "modo": "claude",
   "triggers": {
     "enabled": true,
     "auto_inject": true,
     "max_patterns": 3
+  },
+  "confirm": {
+    "enabled": true
+  },
+  "dashboard": {
+    "chat": true,
+    "notes": true,
+    "updates": true
   },
   "provedores_externos": {
     "mistral": {

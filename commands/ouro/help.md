@@ -16,10 +16,12 @@ Quando o usuário digitar /ouro:help, exiba a lista completa de comandos organiz
 - `/ouro:executar [fase]` — Executa o plano de uma fase
 - `/ouro:verificar [fase]` — Verifica conformidade com Kit Ouro
 
-### 💬 Sessão
+### 💬 Sessão e Chat
 - `/ouro:pausar` — Salva contexto antes de encerrar sessão
 - `/ouro:retomar` — Carrega contexto da última sessão
 - `/ouro:rapido "texto"` — Tarefa ad-hoc sem planejamento completo
+- `/ouro:chat` — Chat interativo: linguagem natural para prompt CO-STAR
+- `/ouro:notas "texto"` — Bloco de notas inteligente com auto-tag
 
 ### ✨ Gerador de Prompts
 - `/ouro:prompt "texto"` — Otimiza e executa prompt

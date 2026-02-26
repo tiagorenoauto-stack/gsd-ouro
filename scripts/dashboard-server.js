@@ -96,6 +96,26 @@ const getRoutes = {
   '/api/intelligence': () => {
     const intelligence = require('../lib/intelligence');
     return intelligence.getIntelligenceReport(OURO_DIR);
+  },
+  '/api/notes': () => {
+    const notes = require('../lib/notes-engine');
+    return notes.listNotes();
+  },
+  '/api/notes/stats': () => {
+    const notes = require('../lib/notes-engine');
+    return notes.getStats();
+  },
+  '/api/updates': () => {
+    const updates = require('../lib/update-control');
+    return updates.getUpdateHistory();
+  },
+  '/api/updates/summary': () => {
+    const updates = require('../lib/update-control');
+    return updates.generateSummary();
+  },
+  '/api/preferences': () => {
+    const prefsPath = path.join(OURO_DIR, 'preferences.json');
+    return readJSON(prefsPath) || { confirm_enabled: true };
   }
 };
 
@@ -130,6 +150,31 @@ const postRoutes = {
   '/api/track/prevention': async (body) => {
     const errorKB = require('../lib/error-kb');
     return errorKB.addPreventionRule(OURO_DIR, body);
+  },
+  '/api/chat': async (body) => {
+    const chat = require('../lib/chat-engine');
+    const history = body.history || [];
+    return chat.processMessage(body.message || '', history, {});
+  },
+  '/api/chat/clear': async () => {
+    const chat = require('../lib/chat-engine');
+    return chat.clearHistory();
+  },
+  '/api/notes': async (body) => {
+    const notes = require('../lib/notes-engine');
+    return notes.addNote(body.text || '', body.tags, body.module, body.priority);
+  },
+  '/api/updates': async (body) => {
+    const updates = require('../lib/update-control');
+    return updates.logUpdate(body);
+  },
+  '/api/preferences': async (body) => {
+    const prefsPath = path.join(OURO_DIR, 'preferences.json');
+    const current = readJSON(prefsPath) || {};
+    const merged = Object.assign(current, body);
+    fs.mkdirSync(path.dirname(prefsPath), { recursive: true });
+    fs.writeFileSync(prefsPath, JSON.stringify(merged, null, 2));
+    return merged;
   }
 };
 
@@ -150,7 +195,7 @@ function sendJSON(res, status, data) {
 // HTTP Server
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -166,13 +211,38 @@ const server = http.createServer(async (req, res) => {
   }
 
   // POST API routes
-  if (req.method === 'POST' && req.url.startsWith('/api/track/')) {
+  if (req.method === 'POST' && req.url.startsWith('/api/')) {
     const handler = postRoutes[req.url];
     if (!handler) return sendJSON(res, 404, { error: 'Not found' });
     try {
       const body = await parseBody(req);
       const result = await handler(body);
       return sendJSON(res, 200, { ok: true, data: result });
+    } catch (err) {
+      return sendJSON(res, 400, { error: err.message });
+    }
+  }
+
+  // PUT API routes (note updates)
+  if (req.method === 'PUT' && req.url.startsWith('/api/notes/')) {
+    const id = req.url.replace('/api/notes/', '');
+    try {
+      const body = await parseBody(req);
+      const notes = require('../lib/notes-engine');
+      const result = notes.updateNote(id, body);
+      return sendJSON(res, result ? 200 : 404, result ? { ok: true, data: result } : { error: 'Not found' });
+    } catch (err) {
+      return sendJSON(res, 400, { error: err.message });
+    }
+  }
+
+  // DELETE API routes (note deletion)
+  if (req.method === 'DELETE' && req.url.startsWith('/api/notes/')) {
+    const id = req.url.replace('/api/notes/', '');
+    try {
+      const notes = require('../lib/notes-engine');
+      const ok = notes.deleteNote(id);
+      return sendJSON(res, ok ? 200 : 404, ok ? { ok: true } : { error: 'Not found' });
     } catch (err) {
       return sendJSON(res, 400, { error: err.message });
     }
@@ -197,6 +267,9 @@ server.listen(PORT, () => {
   console.log('  /api/tips          Dicas contextuais');
   console.log('  /api/health        Health score');
   console.log('  /api/intelligence  Relatorio completo');
+  console.log('  /api/notes         Notas (CRUD)');
+  console.log('  /api/updates       Historico de updates');
+  console.log('  /api/preferences   Preferencias do usuario');
   console.log('\nAPI de escrita (POST):');
   console.log('  /api/track/session/start   Iniciar sessao');
   console.log('  /api/track/session/end     Finalizar sessao');
@@ -206,5 +279,9 @@ server.listen(PORT, () => {
   console.log('  /api/track/fase            Atualizar fase');
   console.log('  /api/track/refresh         Recalcular dashboard');
   console.log('  /api/track/error           Registrar erro');
-  console.log('  /api/track/prevention      Criar regra de prevencao\n');
+  console.log('  /api/track/prevention      Criar regra de prevencao');
+  console.log('  /api/chat                  Chat interativo');
+  console.log('  /api/notes                 Criar nota');
+  console.log('  /api/updates               Registrar atualizacao');
+  console.log('  /api/preferences           Salvar preferencias\n');
 });

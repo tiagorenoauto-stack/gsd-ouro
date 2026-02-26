@@ -1,0 +1,17 @@
+[
+  {
+    "version": "0.7.0",
+    "date": "2026-02-26",
+    "timestamp": "2026-02-26T22:09:54.012Z",
+    "type": "release",
+    "description": "Dashboard interativo + Chat + Notas",
+    "files_changed": [],
+    "files_added": [],
+    "breaking": false,
+    "highlights": [
+      "chat-engine",
+      "notes-engine",
+      "update-control"
+    ]
+  }
+]
