@@ -128,6 +128,7 @@ switch (command) {
     const framework = flags.framework || flags.fw || null;
     const technique = flags.tecnica || flags.technique || null;
     const otimizar = flags.otimizar === 'true' || flags.optimize === 'true';
+    const refs = flags.refs || flags.ref || null;
 
     // AI-powered generation
     if (criador) {
@@ -136,7 +137,7 @@ switch (command) {
           header(`🤖 PROMPT GENERATOR PRO — via ${criador.toUpperCase()}`);
           console.log(dim(`  Gerando prompt com ${pg.CREATOR_MODELS[criador]?.label || criador}...\n`));
 
-          const result = await pg.generateWithAI(text, { criador, modelo, tipo, framework });
+          const result = await pg.generateWithAI(text, { criador, modelo, tipo, framework, references: refs });
 
           console.log(`  ${bold('Criador:')}    ${result.criadorLabel} ${dim('(IA que gerou)')}`);
           console.log(`  ${bold('Alvo:')}       ${result.modelo} ${dim('(modelo que vai receber)')}`);
@@ -179,7 +180,7 @@ switch (command) {
 
     if (otimizar) {
       header('⚡ PROMPT GENERATOR PRO — Variações');
-      const variations = pg.generateVariations(text, { modelo, tipo, variations: 4 });
+      const variations = pg.generateVariations(text, { modelo, tipo, variations: 4, references: refs });
 
       for (const v of variations) {
         const sc = v.score;
@@ -196,7 +197,7 @@ switch (command) {
       console.log(dim(best.prompt.split('\n').map(l => '  ' + l).join('\n')));
 
     } else {
-      const result = pg.generate(text, { modelo, tipo, framework, technique });
+      const result = pg.generate(text, { modelo, tipo, framework, technique, references: refs });
 
       header('⚡ PROMPT GENERATOR PRO');
 
@@ -637,12 +638,80 @@ switch (command) {
   }
 
   // ────────────────────────────────────────────────
+  // GUIDED (Iterative Refinement)
+  // ────────────────────────────────────────────────
+  case 'guided':
+  case 'guiado': {
+    const tipo = flags.tipo || flags.type || extractText(1) || 'codigo';
+    const validTypes = Object.keys(pg.GUIDED_QUESTIONS);
+
+    if (!validTypes.includes(tipo)) {
+      console.log(c('red', `Tipo "${tipo}" inválido.`));
+      console.log(`Tipos válidos: ${validTypes.join(', ')}`);
+      process.exit(1);
+    }
+
+    const questions = pg.getGuidedQuestions(tipo);
+
+    header('🎯 MODO GUIADO — Refinamento Iterativo');
+
+    console.log(`  ${bold('Tipo:')} ${tipo}`);
+    console.log(`  ${bold('Perguntas:')} ${questions.length}`);
+    console.log(`  ${dim('Responda cada pergunta para gerar um prompt de alta qualidade.')}`);
+    console.log('');
+
+    // Check if answers were provided via --key flags
+    const hasAnswers = questions.some(q => flags[q.key]);
+
+    if (hasAnswers) {
+      // Answers provided via flags: generate directly
+      const answers = questions.map(q => ({
+        key: q.key,
+        q: q.q,
+        answer: flags[q.key] || '',
+      }));
+
+      subHeader('Respostas Fornecidas');
+      for (const a of answers) {
+        const status = a.answer ? c('green', '●') : c('red', '○');
+        console.log(`  ${status} ${bold(a.key)}: ${a.answer || dim('(não respondido)')}`);
+      }
+      console.log('');
+
+      const modelo = flags.modelo || flags.model || 'claude';
+      const result = pg.generateFromAnswers(answers, { modelo, tipo });
+
+      subHeader('Prompt Gerado');
+      console.log(`  Score: ${c(scoreColor(result.score), `${result.score}/100`)} ${c(gradeColor(result.grade), `[${result.grade}]`)}`);
+      console.log(`  Framework: ${result.frameworkLabel}`);
+      console.log(`  Técnica: ${result.techniqueLabel}`);
+      console.log('');
+      console.log(result.prompt);
+
+    } else {
+      // No answers: show questions for the user to answer
+      subHeader('Perguntas para Refinamento');
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        console.log(`  ${c('cyan', `${i + 1}.`)} ${bold(`[${q.key}]`)} ${q.q}`);
+      }
+      console.log('');
+      console.log(dim('  Para responder, use flags:'));
+      console.log(dim(`  ouro-prompt guided ${tipo} --${questions[0].key} "resposta" --${questions[1].key} "resposta" ...`));
+      console.log('');
+      console.log(dim('  Ou use a skill /ouro:prompt no Claude para modo interativo.'));
+    }
+    break;
+  }
+
+  // ────────────────────────────────────────────────
   // HELP (default)
   // ────────────────────────────────────────────────
   default:
     header('GSD Ouro — Prompt Generator Pro v0.4');
     console.log('Comandos:\n');
     console.log(`  ${c('cyan', 'generate')}  "texto"                      Gerar prompt otimizado`);
+    console.log(`  ${c('cyan', 'guided')}    [tipo]                       Modo guiado (perguntas iterativas)`);
     console.log(`  ${c('cyan', 'optimize')}  "prompt fraco"               Reescrever prompt com framework`);
     console.log(`  ${c('cyan', 'verify')}    "prompt"                     Verificar qualidade (deep score)`);
     console.log(`  ${c('cyan', 'simulate')}  "prompt"                     Simular eficácia por modelo`);
@@ -658,6 +727,15 @@ switch (command) {
     console.log(`  --framework  ${dim('costar|rtf|care')}              Framework (auto-selecionado)`);
     console.log(`  --tecnica    ${dim('zero-shot|few-shot-cot|...')}   Técnica (auto-selecionada)`);
     console.log(`  --otimizar                               Gerar 4 variações com ranking`);
+    console.log(`  --refs       ${dim('"código ou doc"')}               Materiais de referência`);
+    console.log('');
+    console.log(`${bold('Modo Guiado')} ${dim('(refinamento iterativo — como AppVida)')}:\n`);
+    console.log(`  guided codigo       Perguntas para geração de código`);
+    console.log(`  guided debug        Perguntas para debug/fix`);
+    console.log(`  guided testes       Perguntas para testes`);
+    console.log(`  guided refactor     Perguntas para refatoração`);
+    console.log(`  guided documentacao Perguntas para documentação`);
+    console.log(`  guided arquitetura  Perguntas para decisões arquiteturais`);
     console.log('');
     console.log(`${bold('Modo IA')} ${dim('(usa provider externo para criar o prompt)')}:\n`);
     console.log(`  --criador gemini     Gemini 2.5 Flash gera o prompt ${dim('(grátis)')}`);
@@ -666,16 +744,18 @@ switch (command) {
     console.log('');
     console.log('Exemplos:\n');
     console.log(dim('  # Geração local (regras JS):'));
-    console.log(dim('  node bin/ouro-prompt.js generate "criar botão de login"'));
-    console.log(dim('  node bin/ouro-prompt.js generate "refatorar auth" --modelo deepseek --otimizar'));
+    console.log(dim('  ouro-prompt generate "criar botão de login"'));
+    console.log(dim('  ouro-prompt generate "refatorar auth" --modelo deepseek --otimizar'));
+    console.log(dim('  ouro-prompt generate "criar API" --refs "export function getUser()..."'));
+    console.log(dim(''));
+    console.log(dim('  # Modo guiado (iterativo):'));
+    console.log(dim('  ouro-prompt guided debug --erro "TypeError null" --contexto "LoginForm"'));
     console.log(dim(''));
     console.log(dim('  # Geração via IA (meta-prompting):'));
-    console.log(dim('  node bin/ouro-prompt.js generate "criar auth JWT" --criador gemini --modelo claude'));
-    console.log(dim('  node bin/ouro-prompt.js optimize "crie um login" --criador deepseek --modelo claude'));
+    console.log(dim('  ouro-prompt generate "criar auth JWT" --criador gemini --modelo claude'));
     console.log(dim(''));
     console.log(dim('  # Outros:'));
-    console.log(dim('  node bin/ouro-prompt.js simulate "seu prompt" --modelo gemini'));
-    console.log(dim('  node bin/ouro-prompt.js compare "prompt A" -- "prompt B"'));
-    console.log(dim('  node bin/ouro-prompt.js verify "<context>...</context><task>...</task>"'));
-    console.log(dim('  node bin/ouro-prompt.js stats'));
+    console.log(dim('  ouro-prompt simulate "seu prompt" --modelo gemini'));
+    console.log(dim('  ouro-prompt compare "prompt A" -- "prompt B"'));
+    console.log(dim('  ouro-prompt verify "<context>...</context><task>...</task>"'));
 }
