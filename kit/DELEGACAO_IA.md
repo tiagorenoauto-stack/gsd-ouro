@@ -1,25 +1,47 @@
-# DELEGAÇÃO DE TAREFAS ENTRE IAs
+# DELEGAÇÃO DE TAREFAS — Modelo Skill-Driven
 
-## Princípio: Claude é o Arquiteto, IAs Econômicas são Operárias
+## Princípio
 
-| Tarefa | IA Principal | Fallback | Justificativa |
-|--------|-------------|----------|---------------|
-| Planejamento de projeto | Claude Sonnet | — | Decisão estratégica |
-| Arquitetura de sistema | Claude Sonnet | — | Precisa entender Kit Ouro |
-| Geração de código | Codestral (grátis) | DeepSeek V3 | Volume alto |
-| Verificação de padrão | Claude Sonnet | Claude Haiku | Conformidade Kit |
-| Testes unitários | DeepSeek V3 (grátis) | Codestral | Tarefa mecânica |
-| Documentação | Gemini 2.5 Pro (grátis) | Mistral Small | Contexto longo |
-| Pesquisa de domínio | Gemini 2.5 Pro (grátis) | DeepSeek R1 | Contexto 1M |
-| Refactoring | Codestral (grátis) | DeepSeek V3 | Tarefa mecânica |
-| Revisão de código | Claude Haiku | Claude Sonnet | Custo-benefício |
-| Debug complexo | Claude Sonnet | DeepSeek R1 | Raciocínio profundo |
-| Correção bugs simples | DeepSeek V3 (grátis) | Codestral | Tarefa padrão |
-| Commits e mensagens | Qualquer IA gratuita | — | Tarefa simples |
+**Claude faz tudo por padrão** (já pago no plano). Cada skill decide se precisa de IA externa.
 
-## Regras Invioláveis
+## Modos de Operação
 
-1. **NUNCA** delegar decisões de arquitetura para IAs econômicas
-2. **NUNCA** delegar verificação de segurança para IAs gratuitas
-3. **SEMPRE** verificar com Claude código de módulos críticos (auth, pagamento, dados sensíveis)
-4. **SEMPRE** registrar qual IA gerou cada artefato para rastreabilidade
+| Modo              | Comportamento                        | Quando usar                          |
+| ----------------- | ------------------------------------ | ------------------------------------ |
+| `claude` (padrão) | Tudo via Claude Code                 | Dia-a-dia normal                     |
+| `economico`       | Skills podem usar providers externos | Testes, experimentação, volume alto  |
+
+Trocar modo: editar `modo` em `.ouro/config.json`
+
+## Como Funciona
+
+1. **A skill define** qual provider e modelo usar — não o orquestrador
+2. **A skill verifica** o modo atual antes de chamar provider externo
+3. Se modo = `claude`, a skill usa Claude normalmente
+4. Se modo = `economico`, a skill pode chamar provider externo via `lib/ai-providers.js`
+
+## Providers Externos Disponíveis
+
+| Provider             | Uso principal            | Vantagem                |
+| -------------------- | ------------------------ | ----------------------- |
+| Mistral (Codestral)  | Código, refactoring      | Rápido, grátis          |
+| Google (Gemini)      | Contexto longo, pesquisa | 1M tokens, grátis       |
+| DeepSeek             | Raciocínio, testes       | Barato, forte em lógica |
+
+## Skill de Consulta Externa
+
+Sempre disponível, independente do modo. Para pedir segunda opinião:
+
+```bash
+/ouro:consultar-externa "pergunta ou código"
+```
+
+Útil para: comparar abordagens, contexto muito longo, opinião diferente.
+
+## Regras
+
+1. **Modo `claude` é o padrão** — zero complexidade
+2. **Modo `economico` é opt-in** — ativar conscientemente
+3. **Cada skill é autônoma** — sabe o que precisa
+4. **Nenhum modelo hardcoded no orquestrador** — modelos ficam na skill ou no config
+5. **Módulos críticos** (auth, pagamento, dados) — sempre Claude, qualquer modo

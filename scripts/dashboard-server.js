@@ -72,6 +72,9 @@ const getRoutes = {
   '/api/prompts': () => {
     const file = path.join(OURO_DIR, 'analytics', 'prompts', 'historico.json');
     return readJSON(file) || [];
+  },
+  '/api/config': () => {
+    return readJSON(path.join(OURO_DIR, 'config.json')) || { modo: 'claude' };
   }
 };
 

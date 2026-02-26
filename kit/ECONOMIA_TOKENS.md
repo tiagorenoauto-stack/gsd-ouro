@@ -1,23 +1,22 @@
 # ECONOMIA DE TOKENS
 
-## Princípios
+## Principios
 
-1. **Contexto mínimo necessário** — Enviar apenas o que a IA precisa, não o projeto inteiro
-2. **Prompts otimizados** — Usar o Gerador de Prompts para máxima eficiência
-3. **IA certa para tarefa certa** — IAs gratuitas para volume, Claude para qualidade
-4. **Cache de contexto** — Reutilizar contexto entre tarefas da mesma sessão
-5. **Compactação diferencial** — Comprimir histórico preservando decisões
+1. **Contexto minimo necessario** — Enviar apenas o que a IA precisa, nao o projeto inteiro
+2. **Prompts otimizados** — Usar o Gerador de Prompts para maxima eficiencia
+3. **Cache de contexto** — Reutilizar contexto entre tarefas da mesma sessao
+4. **Compactacao diferencial** — Comprimir historico preservando decisoes
 
-## Técnicas de Economia
+## Tecnicas de Economia
 
-- **XML para Claude:** Tags XML são 30-50% mais eficientes que texto livre
-- **Referências ao Kit:** "Seguir KIT_OURO.md seção X" em vez de copiar o conteúdo
+- **XML para Claude:** Tags XML sao 30-50% mais eficientes que texto livre
+- **Referencias ao Kit:** "Seguir KIT_OURO.md secao X" em vez de copiar o conteudo
 - **Verify blocks:** Checklist no final evita retrabalho (economia de 2-3x)
-- **Modo rápido:** Para tarefas simples, pular planejamento completo
-- **Batch de tarefas:** Agrupar tarefas similares numa única chamada
+- **Modo rapido:** Para tarefas simples, pular planejamento completo
+- **Batch de tarefas:** Agrupar tarefas similares numa unica chamada
 
-## Meta de Economia
+## Modos de Operacao
 
-- **Mínimo 80%** dos tokens em IAs gratuitas
-- **Máximo 20%** dos tokens em Claude (somente decisões e verificação)
-- **Meta de custo:** < $0.10 por hora de desenvolvimento
+- **Modo `claude` (padrao):** Claude faz tudo — incluso no plano, sem custo extra
+- **Modo `economico` (opt-in):** Skills podem usar providers externos (Codestral, Gemini, DeepSeek)
+- Trocar modo: editar `modo` em `.ouro/config.json`

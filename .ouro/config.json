@@ -1,12 +1,18 @@
 {
-  "version": "0.1.0",
-  "perfil_ia": "economico",
-  "ia_primaria": "claude-sonnet",
-  "ias_gratuitas": [
-    "codestral",
-    "gemini-pro",
-    "deepseek-v3"
-  ],
-  "meta_economia": 80,
-  "meta_custo_hora": 0.1
+  "version": "0.3.0",
+  "modo": "claude",
+  "provedores_externos": {
+    "mistral": {
+      "endpoint": "https://api.mistral.ai/v1/chat/completions",
+      "env_key": "MISTRAL_API_KEY"
+    },
+    "google": {
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta",
+      "env_key": "GEMINI_API_KEY"
+    },
+    "deepseek": {
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "env_key": "DEEPSEEK_API_KEY"
+    }
+  }
 }

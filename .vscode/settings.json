@@ -101,5 +101,50 @@
     "MD033": false,
     "MD041": false,
     "MD024": false
-  }
+  },
+
+  // --- Code Spell Checker ---
+  "cSpell.language": "pt-BR,en",
+  "cSpell.words": [
+    "ouro",
+    "appvida",
+    "gsd",
+    "camelCase",
+    "kebab",
+    "codestral",
+    "deepseek",
+    "gemini",
+    "nestjs",
+    "neon",
+    "monorepo",
+    "roadmap",
+    "boilerplate",
+    "analytics",
+    "workflow",
+    "workflows",
+    "bundlers",
+    "markdownlint",
+    "prettierrc",
+    "prettierignore",
+    "editorconfig",
+    "cursorrules",
+    "gitlens",
+    "eslint",
+    "emmet",
+    "mermaid",
+    "errorlens",
+    "gruntfuggly"
+  ],
+  "cSpell.ignorePaths": [
+    "node_modules",
+    ".git",
+    ".ouro/analytics",
+    "package-lock.json"
+  ],
+  "cSpell.enableFiletypes": [
+    "markdown",
+    "javascript",
+    "json",
+    "html"
+  ]
 }

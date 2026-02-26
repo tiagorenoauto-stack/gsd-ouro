@@ -3,7 +3,9 @@
 > Fonte única de verdade para componentes e padrões deste projeto.
 
 ## Componentes
-_A ser mapeado com /ouro:novo-projeto_
+
+A ser mapeado com /ouro:novo-projeto
 
 ## Padrões de Código
-_A ser definido_
+
+A ser definido

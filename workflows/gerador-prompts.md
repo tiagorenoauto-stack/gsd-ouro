@@ -1,14 +1,16 @@
 # Workflow: Gerador de Prompts
 
 ## Descrição
+
 Transforma texto informal em prompt profissional otimizado.
 
 ## Trigger
+
 `/ouro:prompt "texto"` ou via dashboard web
 
 ## Fluxo
 
-```
+```text
 INPUT (texto do usuário)
   │
   ├─ 1. COLETA DE CONTEXTO (automático)
@@ -18,28 +20,28 @@ INPUT (texto do usuário)
   │   └─ active_context.md → sessão atual
   │
   ├─ 2. DETECÇÃO DE TIPO
-  │   ├─ Código → framework RISE, IA: Codestral
-  │   ├─ Documentação → framework Markdown, IA: Gemini
-  │   ├─ Debug → framework XML, IA: Claude
-  │   └─ Testes → framework RISE, IA: DeepSeek
+  │   ├─ Código → framework RISE
+  │   ├─ Documentação → framework Markdown
+  │   ├─ Debug → framework XML
+  │   └─ Testes → framework RISE
   │
-  ├─ 3. OTIMIZAÇÃO (IA gratuita)
-  │   ├─ Montar meta-prompt com contexto + framework
-  │   ├─ Enviar para Gemini/DeepSeek
-  │   └─ Receber prompt otimizado
+  ├─ 3. OTIMIZAÇÃO
+  │   ├─ Modo claude: Claude otimiza o prompt
+  │   └─ Modo econômico: skill pode usar provider externo
   │
   ├─ 4. PREVIEW (modo completo)
-  │   ├─ Mostrar: IA usada, tokens, custo estimado
+  │   ├─ Mostrar: prompt otimizado, tokens estimados
   │   └─ Opções: Aprovar / Editar / Regenerar / Cancelar
   │
   ├─ 5. EXECUÇÃO (se aprovado)
-  │   └─ Enviar para IA destino
+  │   └─ Executar prompt
   │
   └─ 6. REGISTRO
       └─ Salvar em analytics/prompts/
 ```
 
 ## Modos
+
 - `--rapido` → Pula preview (etapa 4)
 - `--direto` → Pula otimização (etapas 2-3)
 - `--preview` → Só mostra, não executa (para etapa 4)

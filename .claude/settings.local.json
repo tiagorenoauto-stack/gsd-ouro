@@ -24,7 +24,13 @@
       "Bash(cursor --install-extension PKief.material-icon-theme)",
       "Bash(cursor --install-extension aaron-bond.better-comments)",
       "Bash(cursor --list-extensions)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(curl -s http://localhost:3333/api/config)",
+      "Bash(lsof -ti:3333)",
+      "Bash(xargs kill -9)",
+      "Bash(netstat -ano)",
+      "Read(//c/Users/tiago/AppGSD-Ouro/gsd-ouro/**)",
+      "Bash(curl -s http://localhost:3333/)"
     ]
   }
 }
