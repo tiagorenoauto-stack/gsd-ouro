@@ -4,12 +4,14 @@
   "description": "Kit Padrão Ouro — Sistema de desenvolvimento inteligente com orquestração multi-IA para Claude Code",
   "main": "bin/install.js",
   "bin": {
-    "gsd-ouro": "bin/install.js"
+    "gsd-ouro": "bin/install.js",
+    "ouro-track": "bin/ouro-track.js"
   },
   "scripts": {
     "install": "node bin/install.js",
     "start": "node scripts/dashboard-server.js",
     "dashboard": "node scripts/dashboard-server.js",
+    "track": "node bin/ouro-track.js",
     "test": "echo \"Testes serão implementados na v0.2\""
   },
   "keywords": [

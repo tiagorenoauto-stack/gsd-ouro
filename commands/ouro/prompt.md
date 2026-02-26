@@ -40,9 +40,9 @@ Mostrar prompt otimizado com:
 Se aprovado, enviar para IA destino.
 
 ### 7. REGISTRO
-Salvar em `.ouro/analytics/prompts/historico.json`:
-- Input original, prompt otimizado, IA usada
-- Tokens, custo, resultado, avaliação
+```bash
+node bin/ouro-track.js prompt --input "texto original" --tipo Codigo --ia codestral --tokens 500
+```
 
 ## Flags
 - `--rapido` — Pula preview, executa direto
