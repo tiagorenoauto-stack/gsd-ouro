@@ -1,0 +1,12 @@
+{
+  "version": "0.1.0",
+  "perfil_ia": "economico",
+  "ia_primaria": "claude-sonnet",
+  "ias_gratuitas": [
+    "codestral",
+    "gemini-pro",
+    "deepseek-v3"
+  ],
+  "meta_economia": 80,
+  "meta_custo_hora": 0.1
+}

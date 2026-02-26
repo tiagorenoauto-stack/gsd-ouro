@@ -24,7 +24,8 @@
     .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
     .grid2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
     .grid53 { display:grid; grid-template-columns:3fr 2fr; gap:16px; }
-    @media(max-width:768px) { .grid4,.grid2,.grid53 { grid-template-columns:1fr; } }
+    .grid3c { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; text-align:center; }
+    @media(max-width:768px) { .grid4,.grid2,.grid53,.grid3c { grid-template-columns:1fr; } }
 
     /* Cards */
     .card { background:#18181b; border:1px solid #27272a; border-radius:12px; padding:20px; }
@@ -88,18 +89,22 @@
     .donut-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
     .legend { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:12px; font-size:11px; }
     .legend span::before { content:''; display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+
+    /* Empty state */
+    .empty { text-align:center; padding:28px 16px; color:#3f3f46; font-size:13px; }
+    .empty small { color:#27272a; font-size:11px; display:block; margin-top:6px; }
   </style>
 </head>
 <body>
 <header>
   <div style="display:flex;align-items:center;gap:12px">
     <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#fbbf24,#d97706);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#09090b">🏆</div>
-    <div><div style="font-size:16px;font-weight:700">GSD OURO</div><div style="font-size:11px;color:#52525b">Appvida — App de saúde e bem-estar</div></div>
+    <div><div style="font-size:16px;font-weight:700">GSD OURO</div><div style="font-size:11px;color:#52525b" id="hdr-projeto">Carregando...</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <span class="badge badge-yellow mono">Sessão #24</span>
-    <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span>
-    <span style="font-size:11px;color:#52525b">Ativo</span>
+    <span class="badge badge-yellow mono" id="hdr-sessao">—</span>
+    <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block" id="hdr-dot"></span>
+    <span style="font-size:11px;color:#52525b" id="hdr-status">Conectando...</span>
   </div>
 </header>
 
@@ -116,73 +121,40 @@
 <!-- ═══ PAGE 1: VISÃO GERAL ═══ -->
 <div id="p-overview" class="page active space">
   <div class="grid4">
-    <div class="card glow"><h2>📦 Progresso</h2><div class="big mono">42%</div><div class="sub">5 de 9 fases concluídas</div></div>
-    <div class="card glow"><h2>💰 Economia</h2><div class="big mono">91.1%</div><div class="sub">$44.43 economizados</div></div>
-    <div class="card glow"><h2>⚡ Velocidade</h2><div class="big mono">3.2/h</div><div class="sub">↑ 12% vs semana anterior</div></div>
-    <div class="card glow"><h2>🎯 Qualidade</h2><div class="big mono">94.3%</div><div class="sub">conforme Kit Ouro</div></div>
+    <div class="card glow"><h2>📦 Progresso</h2><div class="big mono" id="v-progresso">—</div><div class="sub" id="v-progresso-sub">carregando...</div></div>
+    <div class="card glow"><h2>💰 Economia</h2><div class="big mono" id="v-economia">—</div><div class="sub" id="v-economia-sub">carregando...</div></div>
+    <div class="card glow"><h2>⚡ Velocidade</h2><div class="big mono" id="v-velocidade">—</div><div class="sub" id="v-velocidade-sub">carregando...</div></div>
+    <div class="card glow"><h2>🎯 Qualidade</h2><div class="big mono" id="v-qualidade">—</div><div class="sub" id="v-qualidade-sub">carregando...</div></div>
   </div>
-
   <div class="grid53">
     <div class="card"><h2>📈 Custo ao Longo do Tempo</h2>
       <div style="font-size:11px;color:#52525b;margin-bottom:8px">Vermelho=Se só Claude | Amarelo=Custo real</div>
-      <div class="chart-row"><div class="chart-label">S1</div><div class="chart-bar"><div style="width:64%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$5.20</div></div>
-      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:5%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.42</div></div>
-      <div class="chart-row"><div class="chart-label">S3</div><div class="chart-bar"><div style="width:75%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$6.10</div></div>
-      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:7%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.55</div></div>
-      <div class="chart-row"><div class="chart-label">S5</div><div class="chart-bar"><div style="width:72%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$5.90</div></div>
-      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:6%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.48</div></div>
-      <div class="chart-row"><div class="chart-label">S7</div><div class="chart-bar"><div style="width:100%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">$8.15</div></div>
-      <div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:10%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">$0.85</div></div>
+      <div id="chart-custos"></div>
     </div>
-    <div class="card"><h2>🍩 Distribuição IAs</h2>
-      <div class="donut" style="background:conic-gradient(#fbbf24 0% 26%,#22c55e 26% 65%,#3b82f6 65% 88%,#a855f7 88% 100%)">
-        <div class="donut-center" style="width:80px;height:80px;background:#18181b;border-radius:50%;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;color:#71717a">383 calls</span></div>
-      </div>
-      <div class="legend">
-        <span style="color:#fbbf24">● Claude 26%</span>
-        <span style="color:#22c55e">● Codestral 39%</span>
-        <span style="color:#3b82f6">● Gemini 23%</span>
-        <span style="color:#a855f7">● DeepSeek 12%</span>
-      </div>
-    </div>
+    <div class="card"><h2>🍩 Distribuição IAs</h2><div id="chart-donut-ias"></div></div>
   </div>
-  <div class="card"><h2>🗺️ Timeline do Projeto</h2>
-    <div id="timeline"></div>
-  </div>
-  <div class="card" style="border-color:rgba(251,191,36,0.2)"><h2>⚠️ Alertas (2 ativos)</h2>
-    <div class="space"><div class="alert alert-warn">• Codestral: 4 desvios de padrão — considerar trocar para lógica de autenticação</div>
-    <div class="alert alert-info">• Limite Mistral: 78% usado este mês</div></div>
-  </div>
+  <div class="card"><h2>🗺️ Timeline do Projeto</h2><div id="timeline"></div></div>
+  <div class="card" style="border-color:rgba(251,191,36,0.2)"><h2 id="alertas-title">⚠️ Alertas</h2><div class="space" id="alertas-box"></div></div>
 </div>
 
 <!-- ═══ PAGE 2: ECONOMIA ═══ -->
 <div id="p-costs" class="page space">
-  <div class="card glow"><div class="grid4" style="grid-template-columns:1fr 1fr 1fr;text-align:center">
-    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Custo Real</div><div class="big mono">$4.32</div></div>
-    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Se Só Claude</div><div class="big mono" style="color:#f87171">$48.75</div></div>
-    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Economia</div><div class="big mono" style="color:#4ade80">$44.43</div><span class="badge badge-green mono">91.1%</span></div>
+  <div class="card glow"><div class="grid3c">
+    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Custo Real</div><div class="big mono" id="v-custo-real">—</div></div>
+    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Se Só Claude</div><div class="big mono" style="color:#f87171" id="v-custo-hip">—</div></div>
+    <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Economia</div><div class="big mono" style="color:#4ade80" id="v-econ-valor">—</div><span class="badge badge-green mono" id="v-econ-badge">—</span></div>
   </div></div>
   <div class="grid2">
     <div class="card"><h2>💳 Custo por IA</h2><div id="custoIA"></div></div>
-    <div class="card"><h2>🎯 Custo por Tarefa</h2><div id="custoTarefa"></div></div>
+    <div class="card"><h2>🎯 Custo por Fase</h2><div id="custoFase"></div></div>
   </div>
-  <div class="card" style="border-color:rgba(34,197,94,0.2)"><h2>🔮 Projeção até Conclusão</h2>
-    <div class="grid4" style="grid-template-columns:1fr 1fr 1fr;text-align:center">
-      <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Total Estimado</div><div style="font-size:22px;font-weight:700;color:#fbbf24" class="mono">$12.50</div></div>
-      <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Sem Kit Ouro</div><div style="font-size:22px;font-weight:700;color:#f87171" class="mono">$142.00</div></div>
-      <div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Economia</div><div style="font-size:22px;font-weight:700;color:#4ade80" class="mono">$129.50</div><span class="badge badge-green mono">91.2%</span></div>
-    </div>
-  </div>
+  <div class="card" style="border-color:rgba(34,197,94,0.2)"><h2>🔮 Projeção até Conclusão</h2><div class="grid3c" id="projecao"></div></div>
 </div>
+
 <!-- ═══ PAGE 3: IAs ═══ -->
 <div id="p-ias" class="page space">
   <div class="card"><h2>📊 Tabela Comparativa</h2><table><thead><tr><th>IA</th><th class="tc">Chamadas</th><th class="tc">Sucesso</th><th class="tc">Latência</th><th class="tc">Custo</th><th class="tc">Desvios</th></tr></thead><tbody id="tblIAs"></tbody></table></div>
-  <div class="card"><h2>🏆 Melhor IA por Tarefa</h2><table><thead><tr><th>Tarefa</th><th>Melhor</th><th>2ª opção</th></tr></thead><tbody id="tblMelhor"></tbody></table></div>
-  <div class="card"><h2>⚠️ Recomendações</h2><div class="space">
-    <div class="alert alert-warn">Codestral tem 4 desvios em autenticação → Usar Claude Haiku para módulos de segurança</div>
-    <div class="alert" style="background:#18181b;border-color:#27272a;color:#a1a1aa">DeepSeek V3: 1 falha em 41 chamadas → Dentro do normal. Monitorar.</div>
-    <div class="alert alert-ok">Gemini Pro: 95% sucesso a custo zero → Considerar usar mais para tarefas gerais</div>
-  </div></div>
+  <div class="card"><h2>⚠️ Recomendações</h2><div class="space" id="ias-recs"></div></div>
 </div>
 
 <!-- ═══ PAGE 4: PROMPTS ═══ -->
@@ -190,9 +162,9 @@
   <div class="card"><h2>✨ O que você precisa?</h2>
     <textarea id="promptIn" placeholder='Escreva com suas palavras... ex: "preciso de um componente de upload de fotos"'></textarea>
     <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
-      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">Tipo</label><select><option>Auto</option><option>Código</option><option>Doc</option><option>Debug</option><option>Teste</option></select></div>
-      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">IA destino</label><select><option>Auto</option><option>Claude</option><option>Codestral</option><option>Gemini</option><option>DeepSeek</option></select></div>
-      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">Modo</label><select><option>Completo</option><option>Rápido</option><option>Preview</option></select></div>
+      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">Tipo</label><select id="selTipo"><option>Auto</option><option>Código</option><option>Doc</option><option>Debug</option><option>Teste</option></select></div>
+      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">IA destino</label><select id="selIA"><option>Auto</option><option>Claude</option><option>Codestral</option><option>Gemini</option><option>DeepSeek</option></select></div>
+      <div><label style="font-size:11px;color:#71717a;display:block;margin-bottom:4px">Modo</label><select id="selModo"><option>Completo</option><option>Rápido</option><option>Preview</option></select></div>
     </div>
     <button class="btn btn-gold" style="margin-top:12px" onclick="gerarPrompt()" id="btnGerar">🚀 Gerar Prompt Otimizado</button>
   </div>
@@ -201,6 +173,7 @@
   </div>
   <div class="card"><h2>📜 Histórico</h2><div id="promptHist"></div></div>
 </div>
+
 <!-- ═══ PAGE 5: SESSÕES ═══ -->
 <div id="p-sessions" class="page space">
   <div class="card"><h2>📅 Sessões Recentes</h2><table><thead><tr><th>Data</th><th class="tc">Duração</th><th class="tc">Tarefas</th><th class="tc">Custo</th><th>IAs</th></tr></thead><tbody id="tblSessoes"></tbody></table></div>
@@ -212,52 +185,353 @@
 <!-- ═══ PAGE 6: QUALIDADE ═══ -->
 <div id="p-quality" class="page space">
   <div class="card glow"><h2>🎯 Conformidade Kit Ouro</h2>
-    <div style="display:flex;align-items:center;gap:16px"><div style="flex:1;height:12px;background:#27272a;border-radius:6px;overflow:hidden"><div style="width:94.3%;height:100%;border-radius:6px;background:linear-gradient(90deg,#f59e0b,#eab308)"></div></div><div class="big mono" style="font-size:24px">94.3%</div></div>
+    <div style="display:flex;align-items:center;gap:16px"><div style="flex:1;height:12px;background:#27272a;border-radius:6px;overflow:hidden"><div id="v-conform-bar" style="width:0%;height:100%;border-radius:6px;background:linear-gradient(90deg,#f59e0b,#eab308);transition:width .8s ease"></div></div><div class="big mono" style="font-size:24px" id="v-conform-pct">—</div></div>
   </div>
   <div class="card"><h2>🔍 Desvios Encontrados</h2><table><thead><tr><th>#</th><th>Tipo</th><th>IA</th><th class="tc">Fase</th><th>Status</th></tr></thead><tbody id="tblDesvios"></tbody></table></div>
   <div class="grid2">
-    <div class="card"><h2>🍩 Padrão de Desvios</h2>
-      <div class="donut" style="background:conic-gradient(#ef4444 0% 43%,#fbbf24 43% 57%,#3b82f6 57% 71%,#6b7280 71% 100%)">
-        <div class="donut-center" style="width:80px;height:80px;background:#18181b;border-radius:50%;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;color:#71717a">7 total</span></div>
-      </div>
-      <div class="legend"><span style="color:#ef4444">● CSS 42.9%</span><span style="color:#fbbf24">● Componente 14.3%</span><span style="color:#3b82f6">● Naming 14.3%</span><span style="color:#6b7280">● Outros 28.5%</span></div>
-    </div>
-    <div class="card" style="border-color:rgba(251,191,36,0.2)"><h2>💡 Recomendações</h2><div class="space">
-      <div class="alert alert-warn" style="font-size:12px"><b>Reforçar CSS para Codestral</b><br><span style="color:#71717a">Principal fonte de desvios (42.9%)</span></div>
-      <div class="alert" style="background:#18181b;border-color:#27272a;color:#a1a1aa;font-size:12px"><b>Monitorar DeepSeek naming</b><br><span style="color:#52525b">2 desvios. Adicionar naming conventions.</span></div>
-      <div class="alert alert-ok" style="font-size:12px"><b>Claude e Gemini: excelente</b><br><span style="color:#52525b">0 desvios. Priorizar para tarefas sensíveis.</span></div>
-    </div></div>
+    <div class="card"><h2>🍩 Padrão de Desvios</h2><div id="chart-donut-desvios"></div></div>
+    <div class="card" style="border-color:rgba(251,191,36,0.2)"><h2>💡 Recomendações</h2><div class="space" id="quality-recs"></div></div>
   </div>
 </div>
 </main>
-<footer>GSD Ouro v0.1 — Dashboard Web — Dados de demonstração</footer>
+<footer>GSD Ouro v0.1 — Dashboard Web — Dados em tempo real via API</footer>
 
 <script>
-function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-'+id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>{b.classList.remove('active');if(b.textContent.toLowerCase().includes(id.slice(0,4)))b.classList.add('active')});} 
-document.querySelectorAll('nav button').forEach((b,i)=>{const ids=['overview','costs','ias','prompts','sessions','quality'];b.onclick=()=>show(ids[i]);});
+/* ── Navegação ── */
+function show(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  document.querySelectorAll('nav button').forEach((b,i)=>{
+    const ids=['overview','costs','ias','prompts','sessions','quality'];
+    b.classList.toggle('active',ids[i]===id);
+  });
+}
+document.querySelectorAll('nav button').forEach((b,i)=>{
+  const ids=['overview','costs','ias','prompts','sessions','quality'];
+  b.onclick=()=>show(ids[i]);
+});
 
-const fases=[{n:'Fundação',p:100,s:'done'},{n:'Auth',p:100,s:'done'},{n:'Landing',p:100,s:'done'},{n:'Área Usuário',p:100,s:'done'},{n:'Módulos Core',p:100,s:'done'},{n:'Integrações',p:35,s:'current'},{n:'Admin',p:0,s:'pending'},{n:'Otimização',p:0,s:'pending'},{n:'Testes & Deploy',p:0,s:'pending'}];
+/* ── Helpers ── */
+const $=id=>document.getElementById(id);
+const money=v=>'$'+(v||0).toFixed(2);
+const pct=v=>(v||0).toFixed(1)+'%';
+function emptyMsg(msg){return '<div class="empty">'+msg+'<small>Use /ouro:executar para registrar métricas</small></div>';}
 
-document.getElementById('timeline').innerHTML=fases.map((f,i)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="width:20px;font-size:11px;color:#52525b">${i+1}</span><div class="phase-track" style="flex:1"><div class="phase-fill" style="width:${f.p}%;background:${f.s==='done'?'#22c55e':f.s==='current'?'#fbbf24':'#3f3f46'}"></div></div><span style="width:120px;font-size:11px;color:${f.s==='done'?'#4ade80':f.s==='current'?'#fbbf24':'#52525b'}">${f.s==='done'?'✅':f.s==='current'?'🔄':'⏳'} ${f.n}</span></div>`).join('');
+const IA_COLORS=['#fbbf24','#22c55e','#3b82f6','#a855f7','#ef4444','#06b6d4','#f97316','#ec4899'];
+const IA_ABBR={'Claude Sonnet':'CS','Claude Haiku':'CH','Codestral':'CD','Gemini Pro':'GM','Gemini Flash':'GF','DeepSeek V3':'DS','DeepSeek R1':'DR','DeepSeek':'DS'};
 
-function bars(el,data,max){document.getElementById(el).innerHTML=data.sort((a,b)=>b.v-a.v).map(d=>`<div class="chart-row"><div class="chart-label">${d.n}</div><div class="chart-bar"><div style="width:${d.v>0?Math.max(d.v/max*100,3):3}%;background:${d.v>0?'#fbbf24':'#22c55e'}"></div></div><div class="chart-val mono" style="color:${d.v>0?'#fbbf24':'#4ade80'}">${d.v>0?'$'+d.v.toFixed(2):'grátis'}</div></div>`).join('');}
-bars('custoIA',[{n:'Claude S',v:3.20},{n:'Haiku',v:0.85},{n:'Gemini F',v:0.27},{n:'Gemini P',v:0},{n:'Codestral',v:0},{n:'DeepSeek',v:0}],3.20);
-bars('custoTarefa',[{n:'Planejamento',v:1.80},{n:'Verificação',v:1.20},{n:'Revisão',v:0.85},{n:'Debug',v:0.27},{n:'Código',v:0},{n:'Docs',v:0},{n:'Testes',v:0},{n:'Pesquisa',v:0}],1.80);
-const ias=[{ia:'Claude Sonnet',ch:89,suc:97,lat:'3.2s',c:'$3.20',d:1},{ia:'Gemini Pro',ch:78,suc:95,lat:'2.1s',c:'grátis',d:0},{ia:'DeepSeek V3',ch:41,suc:91,lat:'2.4s',c:'grátis',d:2},{ia:'Codestral',ch:134,suc:89,lat:'1.8s',c:'grátis',d:4},{ia:'Claude Haiku',ch:23,suc:95.6,lat:'1.2s',c:'$0.85',d:0},{ia:'Gemini Flash',ch:18,suc:94.4,lat:'0.9s',c:'$0.27',d:0}];
-document.getElementById('tblIAs').innerHTML=ias.map(a=>`<tr><td style="font-weight:500">${a.ia}</td><td class="tc mono">${a.ch}</td><td class="tc mono" style="color:${a.suc>=95?'#4ade80':a.suc>=90?'#fbbf24':'#f87171'}">${a.suc}%</td><td class="tc mono">${a.lat}</td><td class="tc">${a.c==='grátis'?'<span style="color:#4ade80">grátis</span>':`<span class="mono" style="color:#fbbf24">${a.c}</span>`}</td><td class="tc" style="color:${a.d===0?'#4ade80':'#f87171'}">${a.d}</td></tr>`).join('');
+/* ── Estado ── */
+let D={},S=[],F=[],I=[],P=[];
 
-const melhor=[{t:'Código complexo',m:'Claude Sonnet',s:'DeepSeek R1'},{t:'Código simples',m:'Codestral',s:'DeepSeek V3'},{t:'Documentação',m:'Gemini Pro',s:'Gemini Flash'},{t:'Testes',m:'DeepSeek V3',s:'Codestral'},{t:'Debug',m:'Claude Sonnet',s:'Claude Haiku'},{t:'Pesquisa',m:'Gemini Pro',s:'Claude Sonnet'}];
-document.getElementById('tblMelhor').innerHTML=melhor.map(m=>`<tr><td>${m.t}</td><td><span class="badge badge-yellow mono">${m.m}</span></td><td><span class="badge badge-zinc mono">${m.s}</span></td></tr>`).join('');
+/* ── Fetch ── */
+async function load(){
+  try{
+    const [d,s,f,i,p]=await Promise.all([
+      fetch('/api/dashboard').then(r=>r.json()).catch(()=>({})),
+      fetch('/api/sessoes').then(r=>r.json()).catch(()=>[]),
+      fetch('/api/fases').then(r=>r.json()).catch(()=>[]),
+      fetch('/api/ias').then(r=>r.json()).catch(()=>[]),
+      fetch('/api/prompts').then(r=>r.json()).catch(()=>[]),
+    ]);
+    D=d; S=s; F=f; I=i; P=p;
+    $('hdr-dot').style.background='#4ade80';
+    $('hdr-status').textContent='Ativo';
+  }catch(e){
+    console.error('Erro ao carregar dados:',e);
+    $('hdr-dot').style.background='#f87171';
+    $('hdr-status').textContent='Erro';
+  }
+  renderAll();
+}
 
-const sessoes=[{d:'24/02 #3',dur:'2h15',t:8,c:'$0.45',ias:'CS,CD,GM'},{d:'24/02 #2',dur:'1h40',t:5,c:'$0.32',ias:'CS,GM,DS'},{d:'24/02 #1',dur:'0h45',t:3,c:'$0.12',ias:'CS,CD'},{d:'23/02 #2',dur:'3h10',t:12,c:'$0.78',ias:'CS,CD,GM,DS'},{d:'23/02 #1',dur:'1h55',t:7,c:'$0.41',ias:'CS,CD,GM'},{d:'22/02 #2',dur:'2h30',t:9,c:'$0.52',ias:'CS,CD,GM'},{d:'22/02 #1',dur:'1h15',t:4,c:'$0.18',ias:'CD,GM'},{d:'21/02 #1',dur:'2h45',t:11,c:'$0.67',ias:'CS,CD,GM,DS'}];
-document.getElementById('tblSessoes').innerHTML=sessoes.map(s=>`<tr><td class="mono" style="color:#fbbf24;font-size:11px">${s.d}</td><td class="tc mono" style="font-size:11px">${s.dur}</td><td class="tc mono" style="font-size:11px">${s.t}</td><td class="tc mono" style="color:#fbbf24;font-size:11px">${s.c}</td><td style="font-size:11px">${s.ias.split(',').map(x=>`<span class="badge badge-zinc mono">${x}</span> `).join('')}</td></tr>`).join('');
+/* ── Render ── */
+function renderAll(){
+  renderHeader();
+  renderOverview();
+  renderCosts();
+  renderIAsPage();
+  renderPromptHist();
+  renderSessions();
+  renderQuality();
+}
 
-const desvios=[{id:1,t:'CSS custom',ia:'Codestral',f:2},{id:2,t:'Componente fora',ia:'Codestral',f:3},{id:3,t:'Espaçamento',ia:'DeepSeek',f:3},{id:4,t:'Import errado',ia:'Codestral',f:3},{id:5,t:'Classe Tailwind',ia:'Codestral',f:4},{id:6,t:'Naming pattern',ia:'DeepSeek',f:5},{id:7,t:'Validação falta',ia:'Claude',f:5}];
-document.getElementById('tblDesvios').innerHTML=desvios.map(d=>`<tr><td class="mono" style="color:#52525b;font-size:11px">${d.id}</td><td style="font-size:12px">${d.t}</td><td><span class="badge badge-zinc mono">${d.ia}</span></td><td class="tc mono" style="font-size:11px">${d.f}</td><td><span class="badge badge-green mono">✅ corrigido</span></td></tr>`).join('');
-const prompts=[{h:'15:42',t:'página de perfil...',ia:'Claude',ok:true},{h:'15:20',t:'documentar api...',ia:'Gemini',ok:true},{h:'14:55',t:'botão de confirmação...',ia:'Codestral',ok:true},{h:'14:30',t:'corrigir erro 500...',ia:'Claude',ok:true},{h:'14:10',t:'testes do login...',ia:'DeepSeek',ok:false}];
-document.getElementById('promptHist').innerHTML=prompts.map(p=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #18181b"><span class="mono" style="font-size:11px;color:#52525b;width:40px">${p.h}</span><span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"${p.t}"</span><span class="badge badge-zinc mono">${p.ia}</span><span style="font-size:11px;color:${p.ok?'#4ade80':'#fbbf24'}">${p.ok?'✅ 1ª':'⚠️ 2ª'}</span></div>`).join('');
+function renderHeader(){
+  $('hdr-projeto').textContent=D.projeto||'Nenhum projeto configurado';
+  $('hdr-sessao').textContent=D.sessoes?'Sessão #'+D.sessoes:'Sem sessões';
+}
 
-function gerarPrompt(){const t=document.getElementById('promptIn').value.trim();if(!t)return;const b=document.getElementById('btnGerar');b.textContent='⏳ Gerando...';b.disabled=true;setTimeout(()=>{const tk=Math.floor(Math.random()*800+800);document.getElementById('promptMeta').innerHTML=`<span style="font-size:11px"><span style="color:#52525b">Otimizadora:</span> Gemini 2.5 Pro</span><span style="font-size:11px"><span style="color:#52525b">Destino:</span> <b style="color:#fbbf24">Codestral</b></span><span style="font-size:11px"><span style="color:#52525b">Framework:</span> RISE</span><span style="font-size:11px"><span style="color:#52525b">Tokens:</span> <span class="mono">~${tk}</span></span><span style="font-size:11px"><span style="color:#52525b">Custo:</span> <span class="mono" style="color:#4ade80">$0.00</span></span>`;document.getElementById('promptOut').textContent=`Role: Desenvolvedor React especializado\n\nInstructions:\n1. Usar APENAS componentes do Kit Ouro\n2. NÃO criar CSS custom — apenas TailwindCSS\n3. Seguir espaçamento: p-4 para cards, gap-6 entre seções\n4. Responsivo: mobile-first\n5. Acessibilidade: labels, aria-labels, focus states\n\nContext: ${t.slice(0,60)}...\n\nVerify:\n□ Componentes são do Kit Ouro\n□ Nenhuma classe CSS fora do padrão\n□ Responsivo em mobile (320px) e desktop (1280px)`;document.getElementById('promptRes').style.display='block';b.textContent='🚀 Gerar Prompt Otimizado';b.disabled=false;},1500);}
+/* ── P1: Visão Geral ── */
+function renderOverview(){
+  // Cards
+  $('v-progresso').textContent=D.progresso?pct(D.progresso):'0%';
+  if(F.length){
+    var done=F.filter(f=>f.status==='done').length;
+    $('v-progresso-sub').textContent=done+' de '+F.length+' fases concluídas';
+  }else{
+    $('v-progresso-sub').textContent=D.progresso>0?D.progresso+'% concluído':'nenhuma fase registrada';
+  }
+
+  $('v-economia').textContent=D.economia_pct?pct(D.economia_pct):'0%';
+  var econSaved=(D.custo_hipotetico||0)-(D.custo_real||0);
+  $('v-economia-sub').textContent=econSaved>0?money(econSaved)+' economizados':'sem dados de custo';
+
+  // Velocidade — calculada das sessões
+  var veloc='—',velocSub='sem sessões registradas';
+  if(S.length){
+    var totalT=S.reduce(function(a,s){return a+((s.tarefas&&s.tarefas.total)||0);},0);
+    var totalH=S.reduce(function(a,s){return a+((s.duracao_segundos||0)/3600);},0);
+    if(totalH>0){veloc=(totalT/totalH).toFixed(1)+'/h';velocSub=totalT+' tarefas em '+S.length+' sessões';}
+    else if(totalT>0){veloc=totalT+' tarefas';velocSub=S.length+' sessões';}
+  }
+  $('v-velocidade').textContent=veloc;
+  $('v-velocidade-sub').textContent=velocSub;
+
+  $('v-qualidade').textContent=D.conformidade?pct(D.conformidade):'0%';
+  $('v-qualidade-sub').textContent=D.conformidade>0?'conforme Kit Ouro':'sem verificação';
+
+  // Gráfico custo por sessão
+  if(S.length){
+    var maxH=Math.max.apply(null,S.map(function(s){return(s.custo&&s.custo.hipotetico)||0;}).concat([1]));
+    $('chart-custos').innerHTML=S.slice(0,10).map(function(s,i){
+      var hip=(s.custo&&s.custo.hipotetico)||0;
+      var real=(s.custo&&s.custo.real)||0;
+      var label=s.sessao_id||('S'+(i+1));
+      return '<div class="chart-row"><div class="chart-label">'+label+'</div><div class="chart-bar"><div style="width:'+Math.max(hip/maxH*100,3)+'%;background:#ef4444"></div></div><div class="chart-val" style="color:#ef4444">'+money(hip)+'</div></div>'
+        +'<div class="chart-row"><div class="chart-label"></div><div class="chart-bar"><div style="width:'+Math.max(real/maxH*100,3)+'%;background:#fbbf24"></div></div><div class="chart-val" style="color:#fbbf24">'+money(real)+'</div></div>';
+    }).join('');
+  }else{
+    $('chart-custos').innerHTML=emptyMsg('Nenhuma sessão com dados de custo');
+  }
+
+  // Donut IAs
+  if(I.length){
+    var totalCalls=I.reduce(function(a,ia){return a+(ia.chamadas_total||0);},0);
+    if(totalCalls>0){
+      var acc=0;
+      var parts=I.map(function(ia,idx){
+        var p=ia.chamadas_total/totalCalls*100;
+        var start=acc; acc+=p;
+        return {nome:ia.nome,pct:p,start:start,color:IA_COLORS[idx%IA_COLORS.length]};
+      });
+      var conic=parts.map(function(p){return p.color+' '+p.start+'% '+(p.start+p.pct)+'%';}).join(',');
+      $('chart-donut-ias').innerHTML='<div class="donut" style="background:conic-gradient('+conic+')"><div class="donut-center" style="width:80px;height:80px;background:#18181b;border-radius:50%;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;color:#71717a">'+totalCalls+' calls</span></div></div>'
+        +'<div class="legend">'+parts.map(function(p){return '<span style="color:'+p.color+'">● '+p.nome+' '+p.pct.toFixed(0)+'%</span>';}).join('')+'</div>';
+    }else{
+      $('chart-donut-ias').innerHTML=emptyMsg('IAs registradas mas sem chamadas');
+    }
+  }else{
+    $('chart-donut-ias').innerHTML=emptyMsg('Nenhuma IA registrada');
+  }
+
+  // Timeline fases
+  if(F.length){
+    var sorted=F.slice().sort(function(a,b){return(a.numero||0)-(b.numero||0);});
+    $('timeline').innerHTML=sorted.map(function(f){
+      var s=f.status||'pending';
+      var p=f.progresso_pct||0;
+      var icon=s==='done'?'✅':s==='current'?'🔄':'⏳';
+      var barColor=s==='done'?'#22c55e':s==='current'?'#fbbf24':'#3f3f46';
+      var txtColor=s==='done'?'#4ade80':s==='current'?'#fbbf24':'#52525b';
+      return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="width:20px;font-size:11px;color:#52525b">'+(f.numero||'')+'</span><div class="phase-track" style="flex:1"><div class="phase-fill" style="width:'+p+'%;background:'+barColor+'"></div></div><span style="width:140px;font-size:11px;color:'+txtColor+'">'+icon+' '+(f.nome||'Fase '+f.numero)+'</span></div>';
+    }).join('');
+  }else{
+    $('timeline').innerHTML=emptyMsg('Nenhuma fase registrada');
+  }
+
+  // Alertas
+  var alertas=D.alertas||[];
+  $('alertas-title').textContent=alertas.length?'⚠️ Alertas ('+alertas.length+' ativos)':'⚠️ Alertas';
+  if(alertas.length){
+    $('alertas-box').innerHTML=alertas.map(function(a){
+      if(typeof a==='string') return '<div class="alert alert-warn">• '+a+'</div>';
+      var cls=a.tipo==='warn'?'alert-warn':a.tipo==='ok'?'alert-ok':'alert-info';
+      return '<div class="alert '+cls+'">• '+(a.mensagem||JSON.stringify(a))+'</div>';
+    }).join('');
+  }else{
+    $('alertas-box').innerHTML='<div class="alert alert-ok">Nenhum alerta ativo</div>';
+  }
+}
+
+/* ── P2: Economia ── */
+function renderCosts(){
+  $('v-custo-real').textContent=money(D.custo_real);
+  $('v-custo-hip').textContent=money(D.custo_hipotetico);
+  var econVal=(D.custo_hipotetico||0)-(D.custo_real||0);
+  $('v-econ-valor').textContent=money(econVal);
+  $('v-econ-badge').textContent=D.economia_pct?pct(D.economia_pct):'0%';
+
+  // Custo por IA
+  if(I.length){
+    var maxC=Math.max.apply(null,I.map(function(ia){return ia.custo_total||0;}).concat([0.01]));
+    $('custoIA').innerHTML=I.slice().sort(function(a,b){return(b.custo_total||0)-(a.custo_total||0);}).map(function(ia){
+      var v=ia.custo_total||0;
+      return '<div class="chart-row"><div class="chart-label">'+(ia.nome||'—')+'</div><div class="chart-bar"><div style="width:'+Math.max(v>0?v/maxC*100:3,3)+'%;background:'+(v>0?'#fbbf24':'#22c55e')+'"></div></div><div class="chart-val mono" style="color:'+(v>0?'#fbbf24':'#4ade80')+'">'+(v>0?money(v):'grátis')+'</div></div>';
+    }).join('');
+  }else{
+    $('custoIA').innerHTML=emptyMsg('Nenhuma IA registrada');
+  }
+
+  // Custo por fase
+  if(F.length){
+    var maxFC=Math.max.apply(null,F.map(function(f){return(f.custo&&f.custo.real)||0;}).concat([0.01]));
+    $('custoFase').innerHTML=F.slice().sort(function(a,b){return((b.custo&&b.custo.real)||0)-((a.custo&&a.custo.real)||0);}).map(function(f){
+      var v=(f.custo&&f.custo.real)||0;
+      return '<div class="chart-row"><div class="chart-label">'+(f.nome||'Fase '+f.numero)+'</div><div class="chart-bar"><div style="width:'+Math.max(v>0?v/maxFC*100:3,3)+'%;background:'+(v>0?'#fbbf24':'#22c55e')+'"></div></div><div class="chart-val mono" style="color:'+(v>0?'#fbbf24':'#4ade80')+'">'+(v>0?money(v):'grátis')+'</div></div>';
+    }).join('');
+  }else{
+    $('custoFase').innerHTML=emptyMsg('Nenhuma fase registrada');
+  }
+
+  // Projeção
+  var prog=D.progresso||0;
+  if(prog>0&&(D.custo_real||0)>0){
+    var estReal=D.custo_real/(prog/100);
+    var estHip=(D.custo_hipotetico||0)/(prog/100);
+    var estEcon=estHip-estReal;
+    var estPct=estHip>0?((estEcon/estHip)*100):0;
+    $('projecao').innerHTML=
+      '<div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Total Estimado</div><div style="font-size:22px;font-weight:700;color:#fbbf24" class="mono">'+money(estReal)+'</div></div>'
+      +'<div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Sem Kit Ouro</div><div style="font-size:22px;font-weight:700;color:#f87171" class="mono">'+money(estHip)+'</div></div>'
+      +'<div><div style="font-size:11px;color:#71717a;text-transform:uppercase;margin-bottom:4px">Economia Projetada</div><div style="font-size:22px;font-weight:700;color:#4ade80" class="mono">'+money(estEcon)+'</div><span class="badge badge-green mono">'+pct(estPct)+'</span></div>';
+  }else{
+    $('projecao').innerHTML='<div style="grid-column:1/-1">'+emptyMsg('Precisa de progresso e custo para projetar')+'</div>';
+  }
+}
+
+/* ── P3: IAs ── */
+function renderIAsPage(){
+  if(I.length){
+    $('tblIAs').innerHTML=I.map(function(a){
+      var suc=a.taxa_sucesso_pct||0;
+      var lat=a.latencia_media_s?(a.latencia_media_s.toFixed(1)+'s'):'—';
+      var custo=(a.custo_total||0)>0?money(a.custo_total):'grátis';
+      var custoC=(a.custo_total||0)>0?'#fbbf24':'#4ade80';
+      var sucC=suc>=95?'#4ade80':suc>=90?'#fbbf24':'#f87171';
+      var devC=(a.desvios_encontrados||0)===0?'#4ade80':'#f87171';
+      return '<tr><td style="font-weight:500">'+a.nome+'</td><td class="tc mono">'+(a.chamadas_total||0)+'</td><td class="tc mono" style="color:'+sucC+'">'+pct(suc)+'</td><td class="tc mono">'+lat+'</td><td class="tc"><span class="mono" style="color:'+custoC+'">'+custo+'</span></td><td class="tc" style="color:'+devC+'">'+(a.desvios_encontrados||0)+'</td></tr>';
+    }).join('');
+
+    // Recomendações automáticas
+    var recs=[];
+    I.forEach(function(ia){
+      if((ia.desvios_encontrados||0)>2) recs.push({t:'warn',m:ia.nome+': '+ia.desvios_encontrados+' desvios — considerar alternativa para tarefas sensíveis'});
+      if((ia.taxa_sucesso_pct||0)>=95&&(ia.custo_total||0)===0) recs.push({t:'ok',m:ia.nome+': '+pct(ia.taxa_sucesso_pct)+' sucesso a custo zero — excelente'});
+      if((ia.taxa_sucesso_pct||0)<90) recs.push({t:'warn',m:ia.nome+': sucesso abaixo de 90% ('+pct(ia.taxa_sucesso_pct)+') — monitorar'});
+    });
+    $('ias-recs').innerHTML=recs.length?recs.map(function(r){return '<div class="alert alert-'+r.t+'">'+r.m+'</div>';}).join(''):'<div class="alert alert-ok">Todas as IAs operando normalmente</div>';
+  }else{
+    $('tblIAs').innerHTML='<tr><td colspan="6">'+emptyMsg('Nenhuma IA registrada')+'</td></tr>';
+    $('ias-recs').innerHTML=emptyMsg('Sem dados para gerar recomendações');
+  }
+}
+
+/* ── P4: Prompts ── */
+function renderPromptHist(){
+  if(P.length){
+    $('promptHist').innerHTML=P.slice(0,20).map(function(p){
+      var time=p.timestamp?new Date(p.timestamp).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'—';
+      var ok=p.resultado&&p.resultado.indexOf('✅')!==-1;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #18181b"><span class="mono" style="font-size:11px;color:#52525b;width:40px">'+time+'</span><span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"'+(p.input_usuario||'—')+'"</span><span class="badge badge-zinc mono">'+(p.ia_destino||'—')+'</span><span style="font-size:11px;color:'+(ok?'#4ade80':'#fbbf24')+'">'+(ok?'✅':'⚠️')+'</span></div>';
+    }).join('');
+  }else{
+    $('promptHist').innerHTML=emptyMsg('Nenhum prompt gerado ainda');
+  }
+}
+
+/* ── P5: Sessões ── */
+function renderSessions(){
+  if(S.length){
+    $('tblSessoes').innerHTML=S.slice(0,20).map(function(s){
+      var data=s.timestamp?new Date(s.timestamp).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):(s.sessao_id||'—');
+      var secs=s.duracao_segundos||0;
+      var dur=secs>0?(Math.floor(secs/3600)+'h'+String(Math.floor((secs%3600)/60)).padStart(2,'0')):'—';
+      var tarefas=(s.tarefas&&s.tarefas.total)||0;
+      var custo=(s.custo&&s.custo.real)||0;
+      var iasHtml=(s.ias_utilizadas||[]).map(function(ia){
+        var nome=ia.nome||'';
+        var abbr=IA_ABBR[nome]||nome.slice(0,2).toUpperCase();
+        return '<span class="badge badge-zinc mono">'+abbr+'</span> ';
+      }).join('')||'—';
+      return '<tr><td class="mono" style="color:#fbbf24;font-size:11px">'+data+(s.sessao_id?' #'+s.sessao_id.split('_').pop():'')+'</td><td class="tc mono" style="font-size:11px">'+dur+'</td><td class="tc mono" style="font-size:11px">'+tarefas+'</td><td class="tc mono" style="color:#fbbf24;font-size:11px">'+money(custo)+'</td><td style="font-size:11px">'+iasHtml+'</td></tr>';
+    }).join('');
+  }else{
+    $('tblSessoes').innerHTML='<tr><td colspan="5">'+emptyMsg('Nenhuma sessão registrada')+'</td></tr>';
+  }
+}
+
+/* ── P6: Qualidade ── */
+function renderQuality(){
+  var conf=D.conformidade||0;
+  $('v-conform-bar').style.width=conf+'%';
+  $('v-conform-pct').textContent=conf>0?pct(conf):'0%';
+
+  // Coletar desvios de todas as IAs
+  var desvios=[];
+  var counter=1;
+  I.forEach(function(ia){
+    (ia.desvios_detalhados||[]).forEach(function(d){
+      desvios.push({id:counter++,tipo:d.tipo||'—',ia:ia.nome,fase:d.fase||'—',status:d.status||'pendente'});
+    });
+  });
+
+  if(desvios.length){
+    $('tblDesvios').innerHTML=desvios.map(function(d){
+      var badge=d.status==='corrigido'?'<span class="badge badge-green mono">✅ corrigido</span>':'<span class="badge badge-yellow mono">⏳ pendente</span>';
+      return '<tr><td class="mono" style="color:#52525b;font-size:11px">'+d.id+'</td><td style="font-size:12px">'+d.tipo+'</td><td><span class="badge badge-zinc mono">'+d.ia+'</span></td><td class="tc mono" style="font-size:11px">'+d.fase+'</td><td>'+badge+'</td></tr>';
+    }).join('');
+
+    // Donut de padrão de desvios
+    var tipos={};
+    desvios.forEach(function(d){tipos[d.tipo]=(tipos[d.tipo]||0)+1;});
+    var tipoArr=Object.keys(tipos).map(function(k){return{nome:k,count:tipos[k]};}).sort(function(a,b){return b.count-a.count;});
+    var total=desvios.length;
+    var acc2=0;
+    var desvColors=['#ef4444','#fbbf24','#3b82f6','#6b7280','#a855f7','#06b6d4'];
+    var parts2=tipoArr.map(function(t,i){var p2=t.count/total*100;var s2=acc2;acc2+=p2;return{nome:t.nome,pct:p2,start:s2,color:desvColors[i%desvColors.length]};});
+    var conic2=parts2.map(function(p2){return p2.color+' '+p2.start+'% '+(p2.start+p2.pct)+'%';}).join(',');
+    $('chart-donut-desvios').innerHTML='<div class="donut" style="background:conic-gradient('+conic2+')"><div class="donut-center" style="width:80px;height:80px;background:#18181b;border-radius:50%;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;color:#71717a">'+total+' total</span></div></div>'
+      +'<div class="legend">'+parts2.map(function(p2){return '<span style="color:'+p2.color+'">● '+p2.nome+' '+p2.pct.toFixed(1)+'%</span>';}).join('')+'</div>';
+  }else{
+    $('tblDesvios').innerHTML='<tr><td colspan="5">'+emptyMsg('Nenhum desvio encontrado')+'</td></tr>';
+    $('chart-donut-desvios').innerHTML=emptyMsg('Sem desvios para analisar');
+  }
+
+  // Recomendações de qualidade
+  if(I.length){
+    var qrecs=[];
+    var highDev=I.filter(function(ia){return(ia.desvios_encontrados||0)>2;});
+    var zeroDev=I.filter(function(ia){return(ia.desvios_encontrados||0)===0&&(ia.chamadas_total||0)>5;});
+    highDev.forEach(function(ia){qrecs.push({t:'warn',m:'<b>Reforçar padrões para '+ia.nome+'</b><br><span style="color:#71717a">'+ia.desvios_encontrados+' desvios encontrados</span>'});});
+    zeroDev.forEach(function(ia){qrecs.push({t:'ok',m:'<b>'+ia.nome+': excelente</b><br><span style="color:#52525b">0 desvios em '+(ia.chamadas_total||0)+' chamadas</span>'});});
+    $('quality-recs').innerHTML=qrecs.length?qrecs.map(function(r){return '<div class="alert alert-'+r.t+'" style="font-size:12px">'+r.m+'</div>';}).join(''):'<div class="alert alert-ok">Sem recomendações pendentes</div>';
+  }else{
+    $('quality-recs').innerHTML=emptyMsg('Sem dados para gerar recomendações');
+  }
+}
+
+/* ── Gerador de Prompts (local) ── */
+function gerarPrompt(){
+  var t=document.getElementById('promptIn').value.trim();
+  if(!t)return;
+  var b=document.getElementById('btnGerar');
+  b.textContent='⏳ Gerando...';b.disabled=true;
+  setTimeout(function(){
+    var tk=Math.floor(Math.random()*800+800);
+    document.getElementById('promptMeta').innerHTML=
+      '<span style="font-size:11px"><span style="color:#52525b">Otimizadora:</span> Gemini 2.5 Pro</span>'
+      +'<span style="font-size:11px"><span style="color:#52525b">Destino:</span> <b style="color:#fbbf24">Codestral</b></span>'
+      +'<span style="font-size:11px"><span style="color:#52525b">Framework:</span> RISE</span>'
+      +'<span style="font-size:11px"><span style="color:#52525b">Tokens:</span> <span class="mono">~'+tk+'</span></span>'
+      +'<span style="font-size:11px"><span style="color:#52525b">Custo:</span> <span class="mono" style="color:#4ade80">$0.00</span></span>';
+    document.getElementById('promptOut').textContent='Role: Desenvolvedor React especializado\n\nInstructions:\n1. Usar APENAS componentes do Kit Ouro\n2. NÃO criar CSS custom — apenas TailwindCSS\n3. Seguir espaçamento: p-4 para cards, gap-6 entre seções\n4. Responsivo: mobile-first\n5. Acessibilidade: labels, aria-labels, focus states\n\nContext: '+t.slice(0,60)+'...\n\nVerify:\n□ Componentes são do Kit Ouro\n□ Nenhuma classe CSS fora do padrão\n□ Responsivo em mobile (320px) e desktop (1280px)';
+    document.getElementById('promptRes').style.display='block';
+    b.textContent='🚀 Gerar Prompt Otimizado';b.disabled=false;
+  },1500);
+}
+
+/* ── Init ── */
+load();
+setInterval(load,30000);
 </script>
 </body>
 </html>
