@@ -1,12 +1,13 @@
 {
   "name": "gsd-ouro",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Kit Padrão Ouro — Sistema de desenvolvimento inteligente com orquestração multi-IA para Claude Code",
   "main": "bin/install.js",
   "bin": {
     "gsd-ouro": "bin/install.js",
     "ouro-track": "bin/ouro-track.js",
-    "ouro-prompt": "bin/ouro-prompt.js"
+    "ouro-prompt": "bin/ouro-prompt.js",
+    "ouro-intel": "bin/ouro-intel.js"
   },
   "scripts": {
     "install": "node bin/install.js",
@@ -14,6 +15,7 @@
     "dashboard": "node scripts/dashboard-server.js",
     "track": "node bin/ouro-track.js",
     "prompt": "node bin/ouro-prompt.js",
+    "intel": "node bin/ouro-intel.js",
     "test": "echo \"Testes serão implementados na v0.2\""
   },
   "keywords": [

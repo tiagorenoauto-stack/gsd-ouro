@@ -15,6 +15,7 @@
     nav button { padding:12px 16px; font-size:13px; border:none; background:none; color:#71717a; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; font-family:inherit; transition:color .2s; }
     nav button:hover { color:#a1a1aa; }
     nav button.active { color:#fbbf24; border-bottom-color:#fbbf24; font-weight:600; }
+    nav button[data-pg="intelligence"].active { color:#818cf8; border-bottom-color:#6366f1; }
     nav button.hidden { display:none; }
     main { max-width:1200px; margin:0 auto; padding:24px; }
     footer { text-align:center; padding:16px; font-size:11px; color:#3f3f46; border-top:1px solid #18181b; margin-top:32px; }
@@ -110,6 +111,46 @@
     .streak .day { width:14px; height:14px; border-radius:3px; }
     .streak .day.active { background:#fbbf24; }
     .streak .day.empty { background:#27272a; }
+
+    /* ═══ Intelligence Tab ═══ */
+    .kpi-card { background:#18181b; border:1px solid rgba(99,102,241,0.25); border-radius:12px; padding:20px; text-align:center; position:relative; overflow:hidden; }
+    .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,#6366f1,#818cf8); }
+    .kpi-card .kpi-value { font-size:32px; font-weight:700; color:#818cf8; }
+    .kpi-card .kpi-label { font-size:11px; color:#71717a; text-transform:uppercase; letter-spacing:0.5px; margin-top:4px; }
+
+    .glass-card { background:linear-gradient(135deg,rgba(99,102,241,0.06),rgba(99,102,241,0.02)); border:1px solid rgba(99,102,241,0.25); border-radius:16px; padding:24px; }
+    .glass-card h2 { font-size:13px; font-weight:600; color:#818cf8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px; }
+
+    .progress-ring { width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; position:relative; }
+    .ring-inner { width:56px; height:56px; background:#18181b; border-radius:50%; display:flex; align-items:center; justify-content:center; position:absolute; }
+    .ring-value { font-size:20px; font-weight:700; color:#e4e4e7; z-index:1; }
+
+    .cat-badge { display:inline-block; font-size:10px; padding:2px 10px; border-radius:999px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; border:1px solid; }
+    .cat-perf { background:rgba(34,197,94,0.1); color:#4ade80; border-color:rgba(34,197,94,0.2); }
+    .cat-qual { background:rgba(59,130,246,0.1); color:#60a5fa; border-color:rgba(59,130,246,0.2); }
+    .cat-org { background:rgba(168,85,247,0.1); color:#a855f7; border-color:rgba(168,85,247,0.2); }
+    .cat-prev { background:rgba(239,68,68,0.1); color:#f87171; border-color:rgba(239,68,68,0.2); }
+    .cat-econ { background:rgba(251,191,36,0.1); color:#fbbf24; border-color:rgba(251,191,36,0.2); }
+
+    .sev-badge { display:inline-block; font-size:10px; padding:2px 8px; border-radius:999px; font-weight:600; }
+    .sev-critical { background:rgba(239,68,68,0.1); color:#f87171; }
+    .sev-high { background:rgba(249,115,22,0.1); color:#f97316; }
+    .sev-medium { background:rgba(251,191,36,0.1); color:#fbbf24; }
+    .sev-low { background:rgba(34,197,94,0.1); color:#4ade80; }
+
+    .diff-dots { display:inline-flex; gap:2px; }
+    .diff-dots span { display:inline-block; width:8px; height:8px; border-radius:50%; }
+    .diff-dots .filled { background:#818cf8; }
+    .diff-dots .empty { background:#27272a; }
+
+    .intel-border { border-color:rgba(99,102,241,0.25) !important; }
+    .intel-border h2 { color:#818cf8 !important; }
+
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+    .animate-in { animation:fadeInUp 0.4s ease backwards; }
+
+    .tip-card { display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid rgba(99,102,241,0.1); }
+    .tip-card:last-child { border-bottom:none; }
   </style>
 </head>
 <body>
@@ -137,6 +178,7 @@
   <button data-pg="prompts">Prompts</button>
   <button data-pg="sessions">Sessoes</button>
   <button data-pg="quality">Qualidade</button>
+  <button data-pg="intelligence" style="color:#6366f1">Inteligencia</button>
 </nav>
 
 <main class="sp">
@@ -247,12 +289,73 @@
   </div>
 </div>
 
+<!-- ═══ INTELIGENCIA ═══ -->
+<div id="p-intelligence" class="pg sp">
+  <!-- KPI Row -->
+  <div class="g4">
+    <div class="kpi-card animate-in">
+      <div class="progress-ring" id="intel-health-ring"><div class="ring-inner"><span class="ring-value mono" id="intel-health-val">--</span></div></div>
+      <div class="kpi-label">Health Score</div>
+    </div>
+    <div class="kpi-card animate-in" style="animation-delay:0.1s">
+      <div class="kpi-value mono" id="intel-errors-count">0</div>
+      <div class="kpi-label">Erros Rastreados</div>
+    </div>
+    <div class="kpi-card animate-in" style="animation-delay:0.2s">
+      <div class="kpi-value mono" id="intel-prevention-count">0</div>
+      <div class="kpi-label">Regras Prevencao</div>
+    </div>
+    <div class="kpi-card animate-in" style="animation-delay:0.3s">
+      <div class="kpi-value mono" id="intel-tips-count">0</div>
+      <div class="kpi-label">Tips Disponiveis</div>
+    </div>
+  </div>
+
+  <!-- AI Insights -->
+  <div class="glass-card animate-in" style="animation-delay:0.15s">
+    <h2>AI Insights</h2>
+    <div id="intel-insights" class="sp"></div>
+  </div>
+
+  <!-- Error Distribution + Recent Errors -->
+  <div class="g53">
+    <div class="c intel-border animate-in" style="animation-delay:0.2s">
+      <h2>Distribuicao de Erros</h2>
+      <div id="intel-error-dist"></div>
+    </div>
+    <div class="c intel-border animate-in" style="animation-delay:0.25s">
+      <h2>Erros Recentes</h2>
+      <div id="intel-recent-errors" style="max-height:300px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- Prevention Rules + Error Trends -->
+  <div class="g2">
+    <div class="c intel-border animate-in" style="animation-delay:0.3s">
+      <h2>Regras de Prevencao</h2>
+      <table><thead><tr><th>Regra</th><th class="tc">Severidade</th><th class="tc">Matches</th></tr></thead>
+      <tbody id="intel-prevention-tbl"></tbody></table>
+    </div>
+    <div class="c intel-border animate-in" style="animation-delay:0.35s">
+      <h2>Tendencia de Erros (14 dias)</h2>
+      <div id="intel-error-trend"></div>
+    </div>
+  </div>
+
+  <!-- Health Sub-scores -->
+  <div class="c intel-border animate-in" style="animation-delay:0.4s">
+    <h2>Sub-Scores de Saude</h2>
+    <div id="intel-subscores"></div>
+  </div>
+</div>
+
 </main>
-<footer>GSD Ouro v0.3 — Dashboard Adaptativo — Modo <span id="ft-mode">claude</span></footer>
+<footer>GSD Ouro v0.5 — Dashboard Adaptativo — Modo <span id="ft-mode">claude</span></footer>
 
 <script>
 /* ── State ── */
 var D={},S=[],F=[],I=[],P=[],MODO='claude';
+var ERRORS=[],PREV=[],HEALTH={},TIPS=[];
 
 /* ── Helpers ── */
 var $=function(id){return document.getElementById(id)};
@@ -287,9 +390,14 @@ async function load(){
       fetch('/api/fases').then(function(r){return r.json()}).catch(function(){return []}),
       fetch('/api/ias').then(function(r){return r.json()}).catch(function(){return []}),
       fetch('/api/prompts').then(function(r){return r.json()}).catch(function(){return []}),
-      fetch('/api/config').then(function(r){return r.json()}).catch(function(){return {modo:'claude'}})
+      fetch('/api/config').then(function(r){return r.json()}).catch(function(){return {modo:'claude'}}),
+      fetch('/api/errors').then(function(r){return r.json()}).catch(function(){return []}),
+      fetch('/api/prevention').then(function(r){return r.json()}).catch(function(){return []}),
+      fetch('/api/health').then(function(r){return r.json()}).catch(function(){return {}}),
+      fetch('/api/tips').then(function(r){return r.json()}).catch(function(){return []})
     ]);
     D=results[0];S=results[1];F=results[2];I=results[3];P=results[4];MODO=results[5].modo||'claude';
+    ERRORS=results[6];PREV=results[7];HEALTH=results[8];TIPS=results[9];
     $('hdr-dot').style.background='#4ade80';
     $('hdr-st').textContent='Ativo';
   }catch(e){
@@ -311,6 +419,7 @@ function renderAll(){
   renderPromptHist();
   renderSessions();
   renderQuality();
+  renderIntelligence();
 }
 
 /* ── Header ── */
@@ -593,6 +702,101 @@ function renderQuality(){
     });
     $('q-recs').innerHTML=qr.length?qr.map(function(r){return '<div class="al al-'+(r.t==='ok'?'ok':'w')+'">'+r.m+'</div>'}).join(''):'<div class="al al-ok">Sem recomendacoes pendentes</div>';
   }else{$('q-recs').innerHTML=em('Sem dados');}
+}
+
+/* ── P8: Inteligencia ── */
+function renderIntelligence(){
+  var score=HEALTH.total||0;
+  var grade=HEALTH.grade||'--';
+  var ringColor=score>=80?'#4ade80':score>=60?'#fbbf24':'#f87171';
+  $('intel-health-ring').style.background='conic-gradient('+ringColor+' '+(score*3.6)+'deg, #27272a 0deg)';
+  $('intel-health-val').textContent=score;
+  $('intel-health-val').style.color=ringColor;
+
+  $('intel-errors-count').textContent=ERRORS.length;
+  $('intel-prevention-count').textContent=PREV.length;
+  $('intel-tips-count').textContent=TIPS.length;
+
+  // AI Insights: top tips
+  if(TIPS.length){
+    var catMap={Performance:'perf',Quality:'qual',Organization:'org',Prevention:'prev',Economy:'econ'};
+    $('intel-insights').innerHTML=TIPS.slice(0,5).map(function(t){
+      var cls='cat-'+(catMap[t.categoria]||'qual');
+      return '<div class="tip-card"><span class="cat-badge '+cls+'">'+t.categoria+'</span><div><div style="font-size:13px;color:#e4e4e7">'+t.mensagem+'</div>'+(t.acao?'<div style="font-size:11px;color:#71717a;margin-top:4px">→ '+t.acao+'</div>':'')+'</div></div>';
+    }).join('');
+  }else{
+    $('intel-insights').innerHTML=em('Sem insights ainda. Registre erros e sessoes para gerar dicas.');
+  }
+
+  // Error distribution bars
+  if(ERRORS.length){
+    var cats={};
+    ERRORS.forEach(function(e){cats[e.categoria]=(cats[e.categoria]||0)+1});
+    var catArr=Object.keys(cats).map(function(k){return{name:k,count:cats[k]}}).sort(function(a,b){return b.count-a.count});
+    var maxE=catArr[0].count;
+    var catColors={logic:'#6366f1',runtime:'#f87171',syntax:'#fbbf24',network:'#60a5fa',dependency:'#a855f7',config:'#06b6d4'};
+    $('intel-error-dist').innerHTML=catArr.map(function(cc){
+      var color=catColors[cc.name]||'#6366f1';
+      return '<div class="cr"><div class="cl">'+cc.name+'</div><div class="cb"><div style="width:'+Math.max(cc.count/maxE*100,5)+'%;background:'+color+'"></div></div><div class="cv mono" style="color:#818cf8">'+cc.count+'</div></div>';
+    }).join('');
+  }else{
+    $('intel-error-dist').innerHTML=em('Nenhum erro registrado');
+  }
+
+  // Recent errors
+  if(ERRORS.length){
+    var recent=ERRORS.slice(-10).reverse();
+    $('intel-recent-errors').innerHTML=recent.map(function(e){
+      var dots='';
+      for(var d=1;d<=5;d++){dots+='<span class="'+(d<=(e.dificuldade||1)?'filled':'empty')+'"></span>';}
+      var statusBadge=e.status==='resolved'?'<span class="b b-g">ok</span>':'<span class="b b-y">'+(e.status||'new')+'</span>';
+      return '<div style="padding:8px 0;border-bottom:1px solid #1a1a1e;font-size:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e4e4e7">'+(e.message||'').slice(0,50)+'</span><span class="diff-dots">'+dots+'</span>'+statusBadge+'</div>'+(e.solucao?'<div style="font-size:11px;color:#71717a;margin-top:2px">→ '+e.solucao.slice(0,70)+'</div>':'')+'</div>';
+    }).join('');
+  }else{
+    $('intel-recent-errors').innerHTML=em('Nenhum erro registrado');
+  }
+
+  // Prevention rules table
+  if(PREV.length){
+    $('intel-prevention-tbl').innerHTML=PREV.map(function(r){
+      var cls='sev-'+(r.severidade||'medium');
+      return '<tr><td style="font-size:12px">'+(r.regra||r.trigger).slice(0,50)+'</td><td class="tc"><span class="sev-badge '+cls+'">'+(r.severidade||'medium')+'</span></td><td class="tc mono" style="font-size:11px;color:#818cf8">'+(r.matches||0)+'</td></tr>';
+    }).join('');
+  }else{
+    $('intel-prevention-tbl').innerHTML='<tr><td colspan="3">'+em('Nenhuma regra de prevencao')+'</td></tr>';
+  }
+
+  // Error trend sparkline (14 days)
+  if(ERRORS.length){
+    var days=[];
+    for(var i=13;i>=0;i--){
+      var dd=new Date(Date.now()-i*86400000).toISOString().slice(0,10);
+      var count=ERRORS.filter(function(e){return(e.timestamp||'').slice(0,10)===dd}).length;
+      days.push({date:dd,count:count});
+    }
+    var maxVal=Math.max.apply(null,days.map(function(d){return d.count}).concat([1]));
+    var w=400,h=80,pad=10;
+    var stepX=(w-pad*2)/(days.length-1);
+    var pts=days.map(function(d,idx){return(pad+idx*stepX)+','+(h-pad-(d.count/maxVal)*(h-pad*2))});
+    var areaStart=pad+','+( h-pad);
+    var areaEnd=(pad+(days.length-1)*stepX)+','+(h-pad);
+    $('intel-error-trend').innerHTML='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:80px"><polygon points="'+areaStart+' '+pts.join(' ')+' '+areaEnd+'" fill="rgba(99,102,241,0.08)" stroke="none"/><polyline points="'+pts.join(' ')+'" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="'+(pad+(days.length-1)*stepX)+'" cy="'+pts[pts.length-1].split(',')[1]+'" r="3" fill="#818cf8"/></svg><div style="display:flex;justify-content:space-between;font-size:10px;color:#3f3f46"><span>'+days[0].date.slice(5)+'</span><span>'+days[days.length-1].date.slice(5)+'</span></div>';
+  }else{
+    $('intel-error-trend').innerHTML=em('Sem dados para sparkline');
+  }
+
+  // Health sub-scores
+  if(HEALTH.subscores){
+    var subs=HEALTH.subscores;
+    $('intel-subscores').innerHTML=Object.keys(subs).map(function(key){
+      var s=subs[key];
+      var barColor=s.score>=80?'#4ade80':s.score>=60?'#fbbf24':'#f87171';
+      var weightPct=Math.round(s.weight*100);
+      return '<div class="cr" style="margin-bottom:10px"><div class="cl" style="width:110px">'+s.label+'</div><div class="cb" style="height:18px"><div style="width:'+s.score+'%;background:'+barColor+';height:100%;border-radius:7px;transition:width 0.8s ease"></div></div><div class="cv mono" style="color:'+barColor+';width:40px">'+s.score+'</div><div style="font-size:10px;color:#3f3f46;width:35px">('+weightPct+'%)</div></div>';
+    }).join('');
+  }else{
+    $('intel-subscores').innerHTML=em('Sem dados de saude');
+  }
 }
 
 /* ── Prompt Generator ── */

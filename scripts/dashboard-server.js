@@ -75,6 +75,27 @@ const getRoutes = {
   },
   '/api/config': () => {
     return readJSON(path.join(OURO_DIR, 'config.json')) || { modo: 'claude' };
+  },
+  '/api/errors': () => {
+    return readJSON(path.join(OURO_DIR, 'errors', 'error-log.json')) || [];
+  },
+  '/api/errors/patterns': () => {
+    return readJSON(path.join(OURO_DIR, 'errors', 'patterns.json')) || [];
+  },
+  '/api/prevention': () => {
+    return readJSON(path.join(OURO_DIR, 'errors', 'prevention.json')) || [];
+  },
+  '/api/tips': () => {
+    const tipsEngine = require('../lib/tips-engine');
+    return tipsEngine.generateTips(OURO_DIR);
+  },
+  '/api/health': () => {
+    const intelligence = require('../lib/intelligence');
+    return intelligence.getHealthScore(OURO_DIR);
+  },
+  '/api/intelligence': () => {
+    const intelligence = require('../lib/intelligence');
+    return intelligence.getIntelligenceReport(OURO_DIR);
   }
 };
 
@@ -101,6 +122,14 @@ const postRoutes = {
   },
   '/api/track/refresh': async () => {
     return analytics.refreshDashboard(OURO_DIR);
+  },
+  '/api/track/error': async (body) => {
+    const errorKB = require('../lib/error-kb');
+    return errorKB.addError(OURO_DIR, body);
+  },
+  '/api/track/prevention': async (body) => {
+    const errorKB = require('../lib/error-kb');
+    return errorKB.addPreventionRule(OURO_DIR, body);
   }
 };
 
@@ -163,6 +192,11 @@ server.listen(PORT, () => {
   console.log('  /api/fases         Status das fases');
   console.log('  /api/ias           Performance das IAs');
   console.log('  /api/prompts       Historico de prompts');
+  console.log('  /api/errors        Knowledge base de erros');
+  console.log('  /api/prevention    Regras de prevencao');
+  console.log('  /api/tips          Dicas contextuais');
+  console.log('  /api/health        Health score');
+  console.log('  /api/intelligence  Relatorio completo');
   console.log('\nAPI de escrita (POST):');
   console.log('  /api/track/session/start   Iniciar sessao');
   console.log('  /api/track/session/end     Finalizar sessao');
@@ -170,5 +204,7 @@ server.listen(PORT, () => {
   console.log('  /api/track/ia              Registrar uso de IA');
   console.log('  /api/track/prompt          Registrar prompt');
   console.log('  /api/track/fase            Atualizar fase');
-  console.log('  /api/track/refresh         Recalcular dashboard\n');
+  console.log('  /api/track/refresh         Recalcular dashboard');
+  console.log('  /api/track/error           Registrar erro');
+  console.log('  /api/track/prevention      Criar regra de prevencao\n');
 });
