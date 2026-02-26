@@ -1,0 +1,36 @@
+{
+  // ═══════════════════════════════════════════
+  // GSD Ouro — Extensões Recomendadas
+  // ═══════════════════════════════════════════
+  "recommendations": [
+    // --- Core: Cursor AI (já integrado) ---
+
+    // --- Markdown (80% dos arquivos do GSD Ouro) ---
+    "DavidAnson.vscode-markdownlint",
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-mermaid",
+
+    // --- Git & Versionamento ---
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // --- JavaScript/Node.js ---
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+
+    // --- Produtividade ---
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker",
+    "streetsidesoftware.code-spell-checker-portuguese-brazilian",
+    "Gruntfuggly.todo-tree",
+    "usernamehw.errorlens",
+
+    // --- Dashboard/HTML ---
+    "ritwickdey.LiveServer",
+
+    // --- Visual ---
+    "PKief.material-icon-theme",
+    "aaron-bond.better-comments"
+  ],
+  "unwantedRecommendations": []
+}

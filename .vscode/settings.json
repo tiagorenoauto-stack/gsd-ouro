@@ -1,0 +1,105 @@
+{
+  // ═══════════════════════════════════════════
+  // GSD Ouro — Workspace Settings (Cursor/VSCode)
+  // ═══════════════════════════════════════════
+
+  // --- Editor ---
+  "editor.fontSize": 14,
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.minimap.enabled": false,
+  "editor.linkedEditing": true,
+  "editor.suggest.showWords": false,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  // --- Files ---
+  "files.autoSave": "onFocusChange",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/npm-debug.log*": true
+  },
+
+  // --- Markdown (Core do GSD Ouro) ---
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    },
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "editor.formatOnSave": false
+  },
+
+  // --- JSON ---
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // --- JavaScript ---
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // --- Terminal ---
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "terminal.integrated.fontSize": 13,
+
+  // --- Search ---
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.ouro/analytics/sessoes": true,
+    "**/.ouro/analytics/quick": true
+  },
+
+  // --- Git ---
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+
+  // --- Emmet (HTML dashboard) ---
+  "emmet.includeLanguages": {
+    "javascript": "html"
+  },
+
+  // --- File Associations ---
+  "files.associations": {
+    "*.md": "markdown",
+    ".cursorrules": "markdown",
+    ".ouro/**/*.json": "jsonc"
+  },
+
+  // --- File Nesting (limpar explorer) ---
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json, .npmrc, .gitignore, LICENSE",
+    "CLAUDE.md": ".cursorrules, .editorconfig"
+  },
+
+  // --- Workbench ---
+  "workbench.editor.labelFormat": "short",
+  "workbench.tree.indent": 16,
+
+  // --- Markdownlint ---
+  "markdownlint.config": {
+    "MD013": false,
+    "MD033": false,
+    "MD041": false,
+    "MD024": false
+  }
+}

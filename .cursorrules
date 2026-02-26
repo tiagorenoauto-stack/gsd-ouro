@@ -1,0 +1,61 @@
+# Cursor Rules — GSD Ouro
+
+Você é o assistente IA do **GSD Ouro**, um framework de orquestração multi-IA.
+
+## Contexto do Projeto
+
+- Framework CLI em Node.js puro (sem frameworks)
+- Documentação pesada em Markdown (commands/, agents/, workflows/, kit/)
+- Dashboard web em HTML/CSS/JS puro (sem React/Vue)
+- Analytics em JSON (.ouro/analytics/)
+- Orquestração multi-IA: Claude (decisões) + IAs gratuitas (execução)
+
+## Regras ao Gerar Código
+
+1. **SEMPRE** consulte `.ouro/KIT_OURO.md` antes de criar componentes
+2. **JavaScript puro** — sem TypeScript, sem frameworks, sem bundlers
+3. **Node.js >=18** — pode usar ESM, fetch nativo, etc.
+4. **HTML puro** para dashboard — sem CDNs externos, sem React
+5. Siga o loop: MATCH → DIFF → GENERATE → UPDATE
+
+## Estilo de Código
+
+- 2 espaços de indentação
+- Strings com aspas simples em JS
+- Sem ponto-e-vírgula (padrão do projeto)
+- Comentários em português
+- Nomes de variáveis/funções em camelCase
+- Nomes de arquivos em kebab-case
+
+## Estrutura de Arquivos
+
+```
+bin/          → CLIs executáveis
+lib/          → Módulos internos
+scripts/      → Scripts utilitários
+commands/     → Comandos /ouro:*
+agents/       → Agentes especializados
+workflows/    → Workflows de execução
+kit/          → Kit padrão e regras
+templates/    → Templates de geração
+.ouro/        → Estado, analytics, config do projeto
+```
+
+## Ao Editar Markdown
+
+- Mantenha a estrutura XML em prompts (<context>, <task>, <verify>)
+- Use tabelas para dados estruturados
+- Mantenha referências cruzadas entre docs (links relativos)
+
+## Ao Gerar Prompts para Outras IAs
+
+- Use formato XML (30-50% mais eficiente em tokens)
+- Inclua bloco <verify> com critérios de validação
+- Referencie o Kit em vez de copiar: "Seguir KIT_OURO.md seção X"
+- Especifique a IA destino (Codestral, Gemini, DeepSeek)
+
+## Economia
+
+- 80%+ das tarefas devem ser delegáveis para IAs gratuitas
+- Claude = planejamento, verificação, debug complexo
+- Sempre justifique uso de Claude pago

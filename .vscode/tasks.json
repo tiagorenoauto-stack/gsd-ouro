@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "GSD: Dashboard",
+      "type": "shell",
+      "command": "node scripts/dashboard-server.js",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "GSD: Track Session",
+      "type": "shell",
+      "command": "node bin/ouro-track.js",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "GSD: Git Status Rápido",
+      "type": "shell",
+      "command": "git status --short && echo '---' && git log --oneline -5",
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

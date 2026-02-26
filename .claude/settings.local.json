@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(cursor --install-extension DavidAnson.vscode-markdownlint)",
+      "Bash(cursor --install-extension yzhang.markdown-all-in-one)",
+      "Bash(cursor --install-extension bierner.markdown-mermaid)",
+      "Bash(cursor --install-extension eamodio.gitlens)",
+      "Bash(cursor --install-extension mhutchie.git-graph)",
+      "Bash(cursor --install-extension esbenp.prettier-vscode)",
+      "Bash(cursor --install-extension dbaeumer.vscode-eslint)",
+      "Bash(cursor --install-extension ZainChen.json)",
+      "Bash(cursor --install-extension christian-kohler.path-intellisense)",
+      "Bash(cursor --install-extension streetsidesoftware.code-spell-checker)",
+      "Bash(cursor --install-extension streetsidesoftware.code-spell-checker-portuguese-brazilian)",
+      "Bash(cursor --install-extension Gruntfuggly.todo-tree)",
+      "Bash(cursor --install-extension usernamehw.errorlens)",
+      "Bash(cursor --install-extension ritwickdey.LiveServer)",
+      "Bash(cursor --install-extension PKief.material-icon-theme)",
+      "Bash(cursor --install-extension aaron-bond.better-comments)",
+      "Bash(cursor --list-extensions)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

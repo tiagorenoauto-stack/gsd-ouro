@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Dashboard Server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dashboard-server.js",
+      "console": "integratedTerminal",
+      "env": {
+        "PORT": "3333"
+      }
+    },
+    {
+      "name": "Ouro Track CLI",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/ouro-track.js",
+      "args": ["${input:trackArgs}"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Install/Init",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/install.js",
+      "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "trackArgs",
+      "type": "promptString",
+      "description": "Argumentos para ouro-track (ex: --session, --phase)"
+    }
+  ]
+}

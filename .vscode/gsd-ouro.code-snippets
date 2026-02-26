@@ -1,0 +1,134 @@
+{
+  // ═══════════════════════════════════════════
+  // GSD Ouro — Snippets Customizados
+  // ═══════════════════════════════════════════
+
+  // --- Markdown Snippets ---
+
+  "GSD Ouro: Prompt XML": {
+    "scope": "markdown",
+    "prefix": "ouro-prompt",
+    "body": [
+      "<context>",
+      "  <project>${1:nome-do-projeto}</project>",
+      "  <kit>Seguir KIT_OURO.md seção ${2:seção}</kit>",
+      "  <ia-destino>${3|Codestral,Gemini 2.5 Pro,DeepSeek V3,Claude Sonnet,Claude Haiku|}</ia-destino>",
+      "</context>",
+      "",
+      "<task>",
+      "  ${4:Descreva a tarefa aqui}",
+      "</task>",
+      "",
+      "<verify>",
+      "  - [ ] ${5:Critério de validação 1}",
+      "  - [ ] ${6:Critério de validação 2}",
+      "</verify>"
+    ],
+    "description": "Prompt XML otimizado do GSD Ouro"
+  },
+
+  "GSD Ouro: Comando novo": {
+    "scope": "markdown",
+    "prefix": "ouro-command",
+    "body": [
+      "# /ouro:${1:nome}",
+      "",
+      "> ${2:Descrição curta do comando}",
+      "",
+      "## Quando usar",
+      "${3:Contexto de uso}",
+      "",
+      "## Execução",
+      "",
+      "### 1. ${4:Primeiro passo}",
+      "${5:Detalhes}",
+      "",
+      "### 2. ${6:Segundo passo}",
+      "${7:Detalhes}",
+      "",
+      "## Output esperado",
+      "${8:O que o comando produz}"
+    ],
+    "description": "Template para novo comando /ouro"
+  },
+
+  "GSD Ouro: Seção Analytics": {
+    "scope": "markdown",
+    "prefix": "ouro-analytics",
+    "body": [
+      "## Analytics — ${1:Nome da Métrica}",
+      "",
+      "| Métrica | Valor |",
+      "|---------|-------|",
+      "| ${2:métrica1} | ${3:valor1} |",
+      "| ${4:métrica2} | ${5:valor2} |",
+      "",
+      "**Observações:** ${6:notas}"
+    ],
+    "description": "Tabela de analytics do GSD Ouro"
+  },
+
+  // --- JavaScript Snippets ---
+
+  "GSD Ouro: Módulo Node": {
+    "scope": "javascript",
+    "prefix": "ouro-module",
+    "body": [
+      "// ${1:descrição do módulo}",
+      "import { readFileSync, writeFileSync } from 'node:fs'",
+      "import { join } from 'node:path'",
+      "",
+      "const OURO_DIR = '.ouro'",
+      "",
+      "export function ${2:nomeFuncao}(${3:params}) {",
+      "  $0",
+      "}",
+      ""
+    ],
+    "description": "Módulo Node.js para GSD Ouro"
+  },
+
+  "GSD Ouro: Ler config .ouro": {
+    "scope": "javascript",
+    "prefix": "ouro-config",
+    "body": [
+      "const config = JSON.parse(",
+      "  readFileSync(join(process.cwd(), '.ouro', 'config.json'), 'utf-8')",
+      ")"
+    ],
+    "description": "Ler config.json do .ouro/"
+  },
+
+  "GSD Ouro: Registrar analytics": {
+    "scope": "javascript",
+    "prefix": "ouro-track",
+    "body": [
+      "// Registrar evento no analytics",
+      "const evento = {",
+      "  timestamp: new Date().toISOString(),",
+      "  tipo: '${1|task,prompt,session,phase|}',",
+      "  ia: '${2|claude-sonnet,claude-haiku,codestral,gemini,deepseek|}',",
+      "  custo: ${3:0},",
+      "  tokens: { input: ${4:0}, output: ${5:0} },",
+      "  resultado: '${6|sucesso,falha,parcial|}'",
+      "}",
+      "$0"
+    ],
+    "description": "Template de evento analytics"
+  },
+
+  // --- HTML Snippets (Dashboard) ---
+
+  "GSD Ouro: Dashboard Card": {
+    "scope": "html",
+    "prefix": "ouro-card",
+    "body": [
+      "<div class=\"card\">",
+      "  <h3>${1:Título}</h3>",
+      "  <div class=\"card-value\" id=\"${2:metricId}\">--</div>",
+      "  <p class=\"card-label\">${3:descrição}</p>",
+      "</div>"
+    ],
+    "description": "Card de métrica para o dashboard"
+  }
+}
