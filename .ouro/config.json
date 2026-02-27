@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
+  "version": "0.8.0",
   "modo": "claude",
   "triggers": {
     "enabled": true,
@@ -12,7 +12,13 @@
   "dashboard": {
     "chat": true,
     "notes": true,
-    "updates": true
+    "updates": true,
+    "comparator": true
+  },
+  "comparator": {
+    "enabled": true,
+    "max_parallel": 4,
+    "history_limit": 100
   },
   "provedores_externos": {
     "mistral": {
@@ -26,6 +32,15 @@
     "deepseek": {
       "endpoint": "https://api.deepseek.com/chat/completions",
       "env_key": "DEEPSEEK_API_KEY"
+    },
+    "groq": {
+      "endpoint": "https://api.groq.com/openai/v1/chat/completions",
+      "env_key": "GROQ_API_KEY"
+    },
+    "ollama": {
+      "endpoint": "http://localhost:11434/api/generate",
+      "env_key": null,
+      "models": ["llama3", "codellama", "mistral"]
     }
   }
 }

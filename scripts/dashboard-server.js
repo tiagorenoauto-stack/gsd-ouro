@@ -116,6 +116,37 @@ const getRoutes = {
   '/api/preferences': () => {
     const prefsPath = path.join(OURO_DIR, 'preferences.json');
     return readJSON(prefsPath) || { confirm_enabled: true };
+  },
+  '/api/compare/ranking': () => {
+    const comparator = require('../lib/ia-comparator');
+    return comparator.getRanking();
+  },
+  '/api/compare/history': () => {
+    const comparator = require('../lib/ia-comparator');
+    return comparator.getHistory(20);
+  },
+  '/api/compare/stats': () => {
+    const comparator = require('../lib/ia-comparator');
+    return comparator.getStats();
+  },
+  '/api/compare/presets': () => {
+    const comparator = require('../lib/ia-comparator');
+    return comparator.getPresets();
+  },
+  '/api/compare/recommendations': () => {
+    const comparator = require('../lib/ia-comparator');
+    const cats = ['codigo', 'debug', 'refactor', 'testes', 'documentacao', 'geral'];
+    const recs = {};
+    cats.forEach(c => { recs[c] = comparator.recommend(c); });
+    return recs;
+  },
+  '/api/providers/available': () => {
+    const aiProviders = require('../lib/ai-providers');
+    return aiProviders.listAvailable();
+  },
+  '/api/providers/metrics': () => {
+    const aiProviders = require('../lib/ai-providers');
+    return aiProviders.getMetrics();
   }
 };
 
@@ -175,6 +206,17 @@ const postRoutes = {
     fs.mkdirSync(path.dirname(prefsPath), { recursive: true });
     fs.writeFileSync(prefsPath, JSON.stringify(merged, null, 2));
     return merged;
+  },
+  '/api/compare': async (body) => {
+    const comparator = require('../lib/ia-comparator');
+    const { prompt, targets, category } = body;
+    if (!prompt) throw new Error('prompt obrigatório');
+    if (!targets || targets.length < 2) throw new Error('mínimo 2 targets');
+    return comparator.compare(prompt, targets, { category });
+  },
+  '/api/providers/test': async () => {
+    const aiProviders = require('../lib/ai-providers');
+    return aiProviders.testAll();
   }
 };
 
@@ -283,5 +325,15 @@ server.listen(PORT, () => {
   console.log('  /api/chat                  Chat interativo');
   console.log('  /api/notes                 Criar nota');
   console.log('  /api/updates               Registrar atualizacao');
-  console.log('  /api/preferences           Salvar preferencias\n');
+  console.log('  /api/preferences           Salvar preferencias');
+  console.log('  /api/compare               Comparar IAs (Multi-IA v0.8)');
+  console.log('  /api/providers/test        Testar providers\n');
+  console.log('Multi-IA (GET):');
+  console.log('  /api/compare/ranking       Ranking global de IAs');
+  console.log('  /api/compare/history       Historico de comparacoes');
+  console.log('  /api/compare/stats         Estatisticas do comparator');
+  console.log('  /api/compare/presets       Presets por categoria');
+  console.log('  /api/compare/recommendations  Recomendacoes por categoria');
+  console.log('  /api/providers/available   Providers disponiveis');
+  console.log('  /api/providers/metrics     Metricas de uso\n');
 });

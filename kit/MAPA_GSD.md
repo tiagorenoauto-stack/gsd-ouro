@@ -258,6 +258,6 @@ node scripts/status-live.js --watch               # Status em tempo real
 | v0.4 | Prompt Pro | Gerador de prompts CO-STAR |
 | v0.5 | Intelligence | Error KB, tips, health score |
 | v0.6 | Smart Kit | 14 padroes, trigger engine, mapa |
-| v0.7 | Interactive | Chat, notas, update control (planejado) |
-| v0.8 | Multi-IA | Comparacao de IAs, scores (planejado) |
+| v0.7 | Interactive | Chat, notas, update control |
+| v0.8 | Multi-IA | Comparacao de IAs, scores, fallback chain, ranking |
 | v0.9 | Auto-Update | Propagacao entre projetos (planejado) |

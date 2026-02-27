@@ -1,5 +1,23 @@
 [
   {
+    "version": "0.8.0",
+    "date": "2026-02-26",
+    "timestamp": "2026-02-26T23:00:00.000Z",
+    "type": "release",
+    "description": "Multi-IA + Score Comparison — Comparador de IAs, ranking, métricas por provider, fallback chain",
+    "files_changed": ["lib/ai-providers.js", "kit/padroes/agentes-arquetipos.md", "dashboard/index.html", "scripts/dashboard-server.js", ".ouro/config.json"],
+    "files_added": ["lib/ia-comparator.js"],
+    "breaking": false,
+    "highlights": [
+      "ia-comparator",
+      "ai-providers-v3",
+      "dashboard-comparacao",
+      "fallback-chain",
+      "rate-limit",
+      "groq-ollama-support"
+    ]
+  },
+  {
     "version": "0.7.0",
     "date": "2026-02-26",
     "timestamp": "2026-02-26T22:09:54.012Z",

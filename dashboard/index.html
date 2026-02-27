@@ -98,6 +98,17 @@
 
     /* Chat tab */
     nav button[data-pg="chat"].active { color:#22d3ee; border-bottom-color:#22d3ee; }
+    nav button[data-pg="comparator"].active { color:#f59e0b; border-bottom-color:#f59e0b; }
+
+    /* Comparator */
+    .cmp-tg { padding:4px 10px; font-size:11px; border-radius:12px; background:#1a1a1e; border:1px solid #27272a; color:#71717a; cursor:pointer; transition:all .2s; user-select:none; }
+    .cmp-tg:hover { border-color:#52525b; color:#a1a1aa; }
+    .cmp-tg.active { border-color:#f59e0b; color:#f59e0b; background:rgba(245,158,11,0.08); }
+    .cmp-card { background:#18181b; border:1px solid #27272a; border-radius:12px; padding:16px; }
+    .cmp-card.winner { border-color:#f59e0b; box-shadow:0 0 12px rgba(245,158,11,0.1); }
+    .cmp-score { font-size:28px; font-weight:700; }
+    .cmp-bar { height:6px; background:#27272a; border-radius:3px; margin:2px 0; }
+    .cmp-bar-fill { height:100%; border-radius:3px; transition:width 0.8s ease; }
     .chat-msg { padding:8px 12px; margin-bottom:6px; border-radius:8px; font-size:13px; line-height:1.5; }
     .chat-user { background:#1a1a2e; border:1px solid #27272a; text-align:right; }
     .chat-ai { background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.15); }
@@ -213,6 +224,7 @@
   <button data-pg="chat" style="color:#22d3ee">Chat</button>
   <button data-pg="notes">Notas</button>
   <button data-pg="updates">Updates</button>
+  <button data-pg="comparator" style="color:#f59e0b">Comparacao</button>
 </nav>
 
 <main class="sp">
@@ -450,6 +462,77 @@ Converse no chat para gerar um prompt CO-STAR profissional.</pre>
   </div>
 </div>
 
+<!-- ═══ COMPARACAO MULTI-IA ═══ -->
+<div id="p-comparator" class="pg sp">
+  <div class="g2">
+    <div class="c" style="border-color:rgba(245,158,11,0.3)">
+      <h2 style="color:#f59e0b">Comparar IAs</h2>
+      <div class="sp">
+        <textarea id="cmp-prompt" placeholder="Digite o prompt para comparar entre IAs..." style="height:80px"></textarea>
+        <div class="g2" style="gap:8px">
+          <select id="cmp-preset" style="flex:1" onchange="applyPreset()">
+            <option value="">Preset...</option>
+            <option value="codigo">Codigo</option>
+            <option value="debug">Debug</option>
+            <option value="documentacao">Documentacao</option>
+            <option value="refactor">Refactor</option>
+            <option value="rapido">Rapido</option>
+          </select>
+          <select id="cmp-cat" style="flex:1">
+            <option value="">Categoria (auto)</option>
+            <option value="codigo">Codigo</option>
+            <option value="debug">Debug</option>
+            <option value="refactor">Refactor</option>
+            <option value="testes">Testes</option>
+            <option value="documentacao">Documentacao</option>
+            <option value="geral">Geral</option>
+          </select>
+        </div>
+        <div id="cmp-targets" style="margin-top:8px">
+          <div style="font-size:11px;color:#71717a;margin-bottom:4px">Targets (provider:model)</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap" id="cmp-target-list">
+            <span class="cmp-tg active" data-t="deepseek:deepseek-chat" onclick="toggleTarget(this)">DeepSeek</span>
+            <span class="cmp-tg active" data-t="google:gemini-2.5-flash" onclick="toggleTarget(this)">Gemini Flash</span>
+            <span class="cmp-tg" data-t="mistral:codestral-latest" onclick="toggleTarget(this)">Codestral</span>
+            <span class="cmp-tg" data-t="groq:llama-3.1-8b-instant" onclick="toggleTarget(this)">Groq Llama</span>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="runComparison()" id="btn-compare" style="margin-top:8px;width:100%">Comparar</button>
+        <div id="cmp-status" style="font-size:11px;color:#71717a;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="c">
+      <h2>Ranking Global</h2>
+      <div id="cmp-ranking">
+        <div class="em">Execute comparacoes para gerar ranking</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cmp-results-section" style="display:none;margin-top:16px">
+    <div class="c" style="border-color:rgba(245,158,11,0.2)">
+      <h2>Resultado da Comparacao</h2>
+      <div id="cmp-winner" style="margin-bottom:16px"></div>
+      <div class="g2" id="cmp-cards"></div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top:16px">
+    <div class="c">
+      <h2>Historico de Comparacoes</h2>
+      <div id="cmp-history">
+        <div class="em">Sem comparacoes ainda</div>
+      </div>
+    </div>
+    <div class="c">
+      <h2>Recomendacoes</h2>
+      <div id="cmp-recommendations">
+        <div class="em">Execute comparacoes para obter recomendacoes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ UPDATES ═══ -->
 <div id="p-updates" class="pg sp">
   <div class="c" style="border-color:rgba(251,191,36,0.2)">
@@ -485,7 +568,7 @@ Converse no chat para gerar um prompt CO-STAR profissional.</pre>
 </div>
 
 </main>
-<footer>GSD Ouro v0.7 — Dashboard Adaptativo — Modo <span id="ft-mode">claude</span></footer>
+<footer>GSD Ouro v0.8 — Dashboard Adaptativo + Multi-IA — Modo <span id="ft-mode">claude</span></footer>
 
 <script>
 /* ── State ── */
@@ -1139,10 +1222,169 @@ function renderUpdates(){
     '<div class="g3c"><div><div class="big mono" style="font-size:20px;color:#fbbf24">'+UPDATES.length+'</div><div class="sub">Total</div></div><div><div class="big mono" style="font-size:20px;color:#e4e4e7">'+versions.length+'</div><div class="sub">Versoes</div></div><div><div class="big mono" style="font-size:20px;color:#4ade80">v'+(UPDATES[0].version||'?')+'</div><div class="sub">Atual</div></div></div>';
 }
 
+/* ── Comparator ── */
+var CMP_RANKING=[];
+var CMP_HISTORY=[];
+var CMP_PRESETS={
+  codigo:['mistral:codestral-latest','deepseek:deepseek-chat'],
+  debug:['deepseek:deepseek-chat','google:gemini-2.5-flash'],
+  documentacao:['google:gemini-2.5-flash','deepseek:deepseek-chat'],
+  refactor:['mistral:codestral-latest','deepseek:deepseek-chat'],
+  rapido:['groq:llama-3.1-8b-instant','mistral:codestral-latest']
+};
+
+function toggleTarget(el){el.classList.toggle('active')}
+
+function applyPreset(){
+  var val=$('cmp-preset').value;if(!val)return;
+  var targets=CMP_PRESETS[val]||[];
+  document.querySelectorAll('.cmp-tg').forEach(function(el){
+    var t=el.getAttribute('data-t');
+    el.classList.toggle('active',targets.indexOf(t)!==-1);
+  });
+  $('cmp-cat').value=val==='rapido'?'geral':val;
+}
+
+function getSelectedTargets(){
+  var targets=[];
+  document.querySelectorAll('.cmp-tg.active').forEach(function(el){
+    targets.push(el.getAttribute('data-t'));
+  });
+  return targets;
+}
+
+function runComparison(){
+  var prompt=$('cmp-prompt').value.trim();
+  if(!prompt){$('cmp-status').textContent='Digite um prompt primeiro';return;}
+  var targets=getSelectedTargets();
+  if(targets.length<2){$('cmp-status').textContent='Selecione pelo menos 2 targets';return;}
+
+  var btn=$('btn-compare');
+  btn.textContent='Comparando...';btn.disabled=true;
+  $('cmp-status').textContent='Enviando para '+targets.length+' providers em paralelo...';
+
+  var body={prompt:prompt,targets:targets};
+  var cat=$('cmp-cat').value;
+  if(cat)body.category=cat;
+
+  fetch('/api/compare',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(function(r){return r.json()})
+  .then(function(data){
+    btn.textContent='Comparar';btn.disabled=false;
+    if(!data.ok){$('cmp-status').textContent='Erro: '+(data.error||'desconhecido');return;}
+    $('cmp-status').textContent='Concluido em '+data.data.results.reduce(function(m,r){return Math.max(m,r.latency_ms)},0)+'ms (max)';
+    renderComparisonResult(data.data);
+    loadComparatorData();
+  })
+  .catch(function(e){
+    btn.textContent='Comparar';btn.disabled=false;
+    $('cmp-status').textContent='Erro: '+e.message;
+  });
+}
+
+function renderComparisonResult(data){
+  $('cmp-results-section').style.display='block';
+
+  if(data.winner){
+    $('cmp-winner').innerHTML='<div style="display:flex;align-items:center;gap:12px"><span style="font-size:11px;color:#71717a">VENCEDOR</span><span style="font-size:16px;font-weight:700;color:#f59e0b">'+data.winner.provider+':'+data.winner.model+'</span><span class="mono" style="font-size:14px;color:#4ade80">Score '+data.winner.score+'</span></div>';
+  }
+
+  var scoreColor=function(s){return s>=80?'#4ade80':s>=60?'#fbbf24':s>=40?'#f97316':'#f87171'};
+  var dims=['relevance','completeness','clarity','latency','cost'];
+  var dimLabels={relevance:'Relevancia',completeness:'Completude',clarity:'Clareza',latency:'Velocidade',cost:'Custo'};
+
+  $('cmp-cards').innerHTML=data.results.map(function(r,i){
+    var isWinner=data.winner&&r.provider===data.winner.provider&&r.model===data.winner.model;
+    var sc=r.score;
+    var bars=dims.map(function(d){
+      var val=sc.breakdown[d]||0;
+      var col=scoreColor(val);
+      return '<div style="display:flex;align-items:center;gap:6px;font-size:11px"><span style="width:72px;color:#71717a">'+dimLabels[d]+'</span><div class="cmp-bar" style="flex:1"><div class="cmp-bar-fill" style="width:'+val+'%;background:'+col+'"></div></div><span class="mono" style="width:24px;text-align:right;color:'+col+'">'+val+'</span></div>';
+    }).join('');
+
+    var tokIn=(r.tokens&&r.tokens.input)||0;
+    var tokOut=(r.tokens&&r.tokens.output)||0;
+    var content=r.content?(r.content.length>300?r.content.slice(0,300)+'...':r.content):'(erro)';
+
+    return '<div class="cmp-card'+(isWinner?' winner':'')+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
+        '<div><span style="font-weight:600;color:'+(isWinner?'#f59e0b':'#e4e4e7')+'">'+r.provider+'</span><span style="color:#52525b;font-size:12px"> : '+r.model+'</span></div>'+
+        (isWinner?'<span style="font-size:10px;background:#f59e0b;color:#000;padding:2px 8px;border-radius:8px;font-weight:600">BEST</span>':'')+
+      '</div>'+
+      '<div class="cmp-score mono" style="color:'+scoreColor(sc.total)+'">'+sc.total+'<span style="font-size:12px;color:#52525b"> /100</span></div>'+
+      '<div style="margin:12px 0">'+bars+'</div>'+
+      '<div style="display:flex;gap:12px;font-size:11px;color:#52525b;border-top:1px solid #27272a;padding-top:8px;margin-top:8px">'+
+        '<span>'+r.latency_ms+'ms</span>'+
+        '<span>'+tokIn+' in / '+tokOut+' out</span>'+
+        '<span class="'+(r.status==='ok'?'':'')+'">'+r.status+'</span>'+
+      '</div>'+
+      '<details style="margin-top:8px"><summary style="font-size:11px;color:#71717a;cursor:pointer">Ver resposta</summary><pre style="font-size:11px;color:#a1a1aa;white-space:pre-wrap;margin-top:8px;padding:8px;background:#09090b;border-radius:6px;max-height:200px;overflow-y:auto">'+escHtml(content)+'</pre></details>'+
+    '</div>';
+  }).join('');
+}
+
+function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function loadComparatorData(){
+  Promise.all([
+    fetch('/api/compare/ranking').then(function(r){return r.json()}).catch(function(){return []}),
+    fetch('/api/compare/history').then(function(r){return r.json()}).catch(function(){return []}),
+    fetch('/api/compare/recommendations').then(function(r){return r.json()}).catch(function(){return {}})
+  ]).then(function(results){
+    CMP_RANKING=results[0];
+    CMP_HISTORY=results[1];
+    renderRanking();
+    renderCmpHistory();
+    renderRecommendations(results[2]);
+  });
+}
+
+function renderRanking(){
+  if(!CMP_RANKING.length){$('cmp-ranking').innerHTML='<div class="em">Execute comparacoes para gerar ranking</div>';return;}
+  var scoreColor=function(s){return s>=80?'#4ade80':s>=60?'#fbbf24':s>=40?'#f97316':'#f87171'};
+  $('cmp-ranking').innerHTML='<table><thead><tr><th>#</th><th>Provider</th><th class="tc">Score</th><th class="tc">Wins</th><th class="tc">Win%</th><th class="tc">Latencia</th></tr></thead><tbody>'+
+    CMP_RANKING.map(function(r){
+      return '<tr><td style="color:#f59e0b;font-weight:600">'+r.rank+'</td><td><span style="color:#e4e4e7">'+r.provider+'</span><span style="color:#52525b;font-size:11px">:'+r.model+'</span></td><td class="tc mono" style="color:'+scoreColor(r.avg_score)+'">'+r.avg_score+'</td><td class="tc mono">'+r.wins+'/'+r.comparisons+'</td><td class="tc mono" style="color:'+scoreColor(r.win_rate)+'">'+r.win_rate+'%</td><td class="tc mono" style="color:#71717a">'+r.avg_latency+'ms</td></tr>';
+    }).join('')+'</tbody></table>';
+}
+
+function renderCmpHistory(){
+  if(!CMP_HISTORY.length){$('cmp-history').innerHTML='<div class="em">Sem comparacoes ainda</div>';return;}
+  $('cmp-history').innerHTML=CMP_HISTORY.slice(0,10).map(function(h){
+    var winner=h.winner?h.winner.provider+':'+h.winner.model:'—';
+    var winScore=h.winner?h.winner.score:'—';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a1e;font-size:12px">'+
+      '<div style="flex:1;color:#a1a1aa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px" title="'+escHtml(h.prompt_preview)+'">'+escHtml(h.prompt_preview)+'</div>'+
+      '<span class="mono" style="color:#f59e0b;min-width:60px;text-align:center">'+winner.split(':')[0]+'</span>'+
+      '<span class="mono" style="color:#4ade80;min-width:30px;text-align:right">'+winScore+'</span>'+
+      '<span style="color:#3f3f46;min-width:60px;text-align:right">'+(h.timestamp||'').slice(5,16)+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+function renderRecommendations(recs){
+  if(!recs||!Object.keys(recs).length){$('cmp-recommendations').innerHTML='<div class="em">Execute comparacoes para obter recomendacoes</div>';return;}
+  var cats=['codigo','debug','refactor','testes','documentacao','geral'];
+  var items=[];
+  cats.forEach(function(cat){
+    var r=recs[cat];
+    if(r&&r.recommendation){
+      items.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a1a1e;font-size:12px">'+
+        '<span style="color:#71717a;width:80px">'+cat+'</span>'+
+        '<span style="color:#f59e0b;font-weight:600">'+r.recommendation.split(':')[0]+'</span>'+
+        '<span class="mono" style="color:#4ade80">'+r.score+'</span>'+
+        '<span class="mono" style="color:#71717a;font-size:10px">'+r.win_rate+'% wins</span>'+
+      '</div>');
+    }
+  });
+  $('cmp-recommendations').innerHTML=items.length?items.join(''):'<div class="em">Sem dados suficientes</div>';
+}
+
 /* ── Init ── */
 load();
 loadNotes();
 loadUpdates();
+loadComparatorData();
 setInterval(load,30000);
 </script>
 </body>
