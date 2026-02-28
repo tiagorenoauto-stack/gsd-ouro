@@ -1,0 +1,56 @@
+{
+  "mistral:codestral-latest": {
+    "provider": "mistral",
+    "model": "codestral-latest",
+    "comparisons": 1,
+    "wins": 1,
+    "total_score": 55,
+    "avg_score": 55,
+    "avg_latency": 879,
+    "total_latency": 879,
+    "categories": {
+      "geral": {
+        "comparisons": 1,
+        "wins": 1,
+        "avg_score": 55,
+        "total_score": 55
+      }
+    }
+  },
+  "groq:llama-3.1-8b-instant": {
+    "provider": "groq",
+    "model": "llama-3.1-8b-instant",
+    "comparisons": 1,
+    "wins": 0,
+    "total_score": 55,
+    "avg_score": 55,
+    "avg_latency": 729,
+    "total_latency": 729,
+    "categories": {
+      "geral": {
+        "comparisons": 1,
+        "wins": 0,
+        "avg_score": 55,
+        "total_score": 55
+      }
+    }
+  },
+  "google:gemini-2.5-flash": {
+    "provider": "google",
+    "model": "gemini-2.5-flash",
+    "comparisons": 1,
+    "wins": 0,
+    "total_score": 45,
+    "avg_score": 45,
+    "avg_latency": 5971,
+    "total_latency": 5971,
+    "categories": {
+      "geral": {
+        "comparisons": 1,
+        "wins": 0,
+        "avg_score": 45,
+        "total_score": 45
+      }
+    }
+  }
+}

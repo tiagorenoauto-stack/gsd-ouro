@@ -1,0 +1,99 @@
+{
+  "id": "cmp_mm5ye2zu_zh7y",
+  "timestamp": "2026-02-28T06:41:56.394Z",
+  "prompt_preview": "Explique em 3 linhas o que � o padr�o SOLID em programa��o",
+  "prompt_length": 58,
+  "category": "geral",
+  "targets": 3,
+  "results": [
+    {
+      "provider": "mistral",
+      "model": "codestral-latest",
+      "content": "O padrão SOLID é um conjunto de cinco princípios de design de software que visam melhorar a manutenção, extensibilidade e legibilidade do código. Cada letra representa um princípio específico: S (Single Responsibility Principle), O (Open/Closed Principle), L (Liskov Substitution Principle), I (Interface Segregation Principle) e D (Dependency Inversion Principle). Esses princípios ajudam os desenvolvedores a criar sistemas mais modulares, flexíveis e fáceis de testar.",
+      "latency_ms": 879,
+      "tokens": {
+        "input": 34,
+        "output": 107
+      },
+      "score": {
+        "total": 55,
+        "breakdown": {
+          "relevance": 20,
+          "completeness": 70,
+          "clarity": 40,
+          "latency": 90,
+          "cost": 100
+        },
+        "weights": {
+          "relevance": 0.3,
+          "completeness": 0.25,
+          "clarity": 0.2,
+          "latency": 0.15,
+          "cost": 0.1
+        }
+      },
+      "status": "ok"
+    },
+    {
+      "provider": "groq",
+      "model": "llama-3.1-8b-instant",
+      "content": "O padrão SOLID é um conjunto de princípios em programação que visa garantir a qualidade e a manutenibilidade do código. Ele é composto por cinco princípios: S (Single Responsibility Principle), O (Open/Closed Principle), L (Liskov Substitution Principle), I (Interface Segregation Principle) e D (Dependency Inversion Principle). Esses princípios ajudam a criar códigos mais modulares, flexíveis e fáceis de manter.",
+      "latency_ms": 729,
+      "tokens": {
+        "input": 64,
+        "output": 103
+      },
+      "score": {
+        "total": 55,
+        "breakdown": {
+          "relevance": 20,
+          "completeness": 70,
+          "clarity": 40,
+          "latency": 90,
+          "cost": 100
+        },
+        "weights": {
+          "relevance": 0.3,
+          "completeness": 0.25,
+          "clarity": 0.2,
+          "latency": 0.15,
+          "cost": 0.1
+        }
+      },
+      "status": "ok"
+    },
+    {
+      "provider": "google",
+      "model": "gemini-2.5-flash",
+      "content": "SOLID é um acrônimo para cinco princípios de design de software orientado a objetos. Seu objetivo é guiar a criação de sistemas mais flexíveis, manuteníveis e extensíveis. Isso resulta em código mais limpo, robusto e fácil de adaptar a futuras mudanças.",
+      "latency_ms": 5971,
+      "tokens": {
+        "input": 18,
+        "output": 56
+      },
+      "score": {
+        "total": 45,
+        "breakdown": {
+          "relevance": 20,
+          "completeness": 70,
+          "clarity": 40,
+          "latency": 25,
+          "cost": 100
+        },
+        "weights": {
+          "relevance": 0.3,
+          "completeness": 0.25,
+          "clarity": 0.2,
+          "latency": 0.15,
+          "cost": 0.1
+        }
+      },
+      "status": "ok"
+    }
+  ],
+  "winner": {
+    "provider": "mistral",
+    "model": "codestral-latest",
+    "score": 55
+  }
+}

@@ -99,6 +99,7 @@
     /* Chat tab */
     nav button[data-pg="chat"].active { color:#22d3ee; border-bottom-color:#22d3ee; }
     nav button[data-pg="comparator"].active { color:#f59e0b; border-bottom-color:#f59e0b; }
+    nav button[data-pg="sync"].active { color:#a78bfa; border-bottom-color:#8b5cf6; }
 
     /* Comparator */
     .cmp-tg { padding:4px 10px; font-size:11px; border-radius:12px; background:#1a1a1e; border:1px solid #27272a; color:#71717a; cursor:pointer; transition:all .2s; user-select:none; }
@@ -225,6 +226,7 @@
   <button data-pg="notes">Notas</button>
   <button data-pg="updates">Updates</button>
   <button data-pg="comparator" style="color:#f59e0b">Comparacao</button>
+  <button data-pg="sync" style="color:#a78bfa">Sync</button>
 </nav>
 
 <main class="sp">
@@ -567,8 +569,56 @@ Converse no chat para gerar um prompt CO-STAR profissional.</pre>
   </div>
 </div>
 
+<!-- ═══ KIT SYNC ═══ -->
+<div id="p-sync" class="pg sp">
+  <div class="g4">
+    <div class="c glow" style="border-color:rgba(167,139,250,0.3)"><h2 style="color:#a78bfa">Hub</h2><div class="big mono" id="sync-hub-count">--</div><div class="sub">padroes no hub</div></div>
+    <div class="c glow"><h2>Local</h2><div class="big mono" id="sync-local-count">--</div><div class="sub">padroes neste projeto</div></div>
+    <div class="c glow"><h2>Em Sync</h2><div class="big mono" id="sync-ok-count" style="color:#4ade80">--</div><div class="sub">identicos</div></div>
+    <div class="c glow"><h2>Projetos</h2><div class="big mono" id="sync-proj-count">--</div><div class="sub">registrados</div></div>
+  </div>
+
+  <div class="g2" style="margin-top:16px">
+    <div class="c" style="border-color:rgba(167,139,250,0.25)">
+      <h2 style="color:#a78bfa">Acoes de Sync</h2>
+      <div class="sp">
+        <div class="al al-i" id="sync-reg-status">Verificando registro...</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-gold" onclick="syncRegister()" id="btn-sync-reg">Registrar Projeto</button>
+          <button class="btn-sm" onclick="syncPush()" id="btn-sync-push">Push para Hub</button>
+          <button class="btn-sm" onclick="syncPull()" id="btn-sync-pull">Pull do Hub</button>
+          <button class="btn-sm" onclick="syncPush(true)" title="Sobrescrever conflitos">Force Push</button>
+          <button class="btn-sm" onclick="syncPull(true)" title="Sobrescrever conflitos">Force Pull</button>
+        </div>
+        <div id="sync-action-result" style="font-size:12px;color:#71717a;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="c">
+      <h2>Diff Local vs Hub</h2>
+      <div id="sync-diff" class="sp">
+        <div class="em">Carregando diff...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top:16px">
+    <div class="c">
+      <h2>Padroes Locais</h2>
+      <div id="sync-local-list" style="max-height:320px;overflow-y:auto">
+        <div class="em">Carregando...</div>
+      </div>
+    </div>
+    <div class="c">
+      <h2>Projetos Registrados</h2>
+      <div id="sync-projects" style="max-height:320px;overflow-y:auto">
+        <div class="em">Carregando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
-<footer>GSD Ouro v0.8 — Dashboard Adaptativo + Multi-IA — Modo <span id="ft-mode">claude</span></footer>
+<footer>GSD Ouro v0.9 — Dashboard Adaptativo + Multi-IA — Modo <span id="ft-mode">claude</span></footer>
 
 <script>
 /* ── State ── */
@@ -1380,11 +1430,126 @@ function renderRecommendations(recs){
   $('cmp-recommendations').innerHTML=items.length?items.join(''):'<div class="em">Sem dados suficientes</div>';
 }
 
+/* ── Kit Sync ── */
+var SYNC_STATUS={};
+
+function loadSyncData(){
+  fetch('/api/sync/status').then(function(r){return r.json()}).then(function(data){
+    SYNC_STATUS=data;
+    renderSync();
+  }).catch(function(){});
+}
+
+function renderSync(){
+  var s=SYNC_STATUS;
+  if(!s.hub)return;
+  $('sync-hub-count').textContent=s.hub.patterns_count||0;
+  $('sync-local-count').textContent=s.current_project.patterns_count||0;
+  $('sync-ok-count').textContent=s.diff.in_sync||0;
+  $('sync-proj-count').textContent=s.projects_registered||0;
+
+  // Registro
+  if(s.current_project.registered){
+    $('sync-reg-status').className='al al-ok';
+    $('sync-reg-status').textContent='Projeto registrado: '+s.current_project.name;
+    $('btn-sync-reg').textContent='Registrado';
+    $('btn-sync-reg').disabled=true;
+  }else{
+    $('sync-reg-status').className='al al-w';
+    $('sync-reg-status').textContent='Projeto nao registrado no hub. Clique "Registrar" para habilitar sync.';
+  }
+
+  // Diff
+  var d=s.diff;
+  var diffHtml='';
+  if(d.only_local>0) diffHtml+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1e;font-size:12px"><span style="color:#4ade80">Somente local</span><span class="mono" style="color:#4ade80">'+d.only_local+'</span></div>';
+  if(d.only_hub>0) diffHtml+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1e;font-size:12px"><span style="color:#60a5fa">Somente no hub</span><span class="mono" style="color:#60a5fa">'+d.only_hub+'</span></div>';
+  if(d.modified>0) diffHtml+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1e;font-size:12px"><span style="color:#f59e0b">Modificados</span><span class="mono" style="color:#f59e0b">'+d.modified+'</span></div>';
+  if(d.in_sync>0) diffHtml+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1e;font-size:12px"><span style="color:#4ade80">Em sync</span><span class="mono" style="color:#4ade80">'+d.in_sync+'</span></div>';
+
+  if(d.details){
+    if(d.details.added.length) diffHtml+='<div style="margin-top:8px;font-size:11px;color:#71717a">Somente local:</div>'+d.details.added.map(function(a){return '<div style="font-size:11px;padding:2px 0;color:#4ade80">+ '+a.name+' <span style="color:#3f3f46">('+a.file+')</span></div>'}).join('');
+    if(d.details.removed.length) diffHtml+='<div style="margin-top:8px;font-size:11px;color:#71717a">Somente no hub:</div>'+d.details.removed.map(function(a){return '<div style="font-size:11px;padding:2px 0;color:#60a5fa">- '+a.name+' <span style="color:#3f3f46">('+a.file+')</span></div>'}).join('');
+    if(d.details.modified.length) diffHtml+='<div style="margin-top:8px;font-size:11px;color:#71717a">Divergentes:</div>'+d.details.modified.map(function(a){return '<div style="font-size:11px;padding:2px 0;color:#f59e0b">~ '+a.name+' <span style="color:#3f3f46">local:'+a.local_hash+' hub:'+a.hub_hash+'</span></div>'}).join('');
+  }
+
+  $('sync-diff').innerHTML=diffHtml||'<div class="al al-ok">Tudo em sync ou hub vazio</div>';
+
+  // Local patterns list
+  if(s.current_project.patterns_count>0){
+    fetch('/api/sync/patterns').then(function(r){return r.json()}).then(function(data){
+      var local=data.local||[];
+      $('sync-local-list').innerHTML=local.map(function(p){
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1a1a1e;font-size:12px"><span style="color:#e4e4e7">'+p.name+'</span><span class="mono" style="color:#3f3f46;font-size:10px">'+p.hash+'</span></div>';
+      }).join('')||'<div class="em">Sem padroes</div>';
+    });
+  }
+
+  // Projects
+  var projects=s.projects||[];
+  if(projects.length){
+    $('sync-projects').innerHTML=projects.map(function(p){
+      var statusBadge=p.is_current?'<span class="b b-g">atual</span>':p.exists?'<span class="b b-z">ok</span>':'<span class="b b-r">nao encontrado</span>';
+      return '<div style="padding:8px 0;border-bottom:1px solid #1a1a1e;font-size:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#e4e4e7;font-weight:600">'+p.name+'</span>'+statusBadge+'</div><div style="color:#3f3f46;font-size:10px;margin-top:2px">'+p.path+'</div><div style="color:#52525b;font-size:10px;margin-top:2px">push: '+(p.last_push?p.last_push.slice(0,16):'nunca')+' | pull: '+(p.last_pull?p.last_pull.slice(0,16):'nunca')+' | '+p.patterns_count+' padroes</div></div>';
+    }).join('');
+  }else{
+    $('sync-projects').innerHTML='<div class="em">Nenhum projeto registrado.<br><small>Clique "Registrar Projeto" para comecar.</small></div>';
+  }
+}
+
+function syncRegister(){
+  $('sync-action-result').textContent='Registrando...';
+  fetch('/api/sync/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})})
+  .then(function(r){return r.json()})
+  .then(function(data){
+    $('sync-action-result').textContent=data.ok?'Projeto registrado: '+(data.data.project.name||''):'Erro: '+(data.error||'');
+    loadSyncData();
+  }).catch(function(e){$('sync-action-result').textContent='Erro: '+e.message});
+}
+
+function syncPush(force){
+  var btn=$('btn-sync-push');
+  btn.textContent='Enviando...';btn.disabled=true;
+  $('sync-action-result').textContent='Push em andamento...';
+  fetch('/api/sync/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({force:!!force})})
+  .then(function(r){return r.json()})
+  .then(function(data){
+    btn.textContent='Push para Hub';btn.disabled=false;
+    if(data.ok){
+      var d=data.data;
+      $('sync-action-result').innerHTML='<span style="color:#4ade80">Push OK:</span> '+d.pushed.length+' enviados'+(d.conflicts.length?' | <span style="color:#f59e0b">'+d.conflicts.length+' conflitos</span>':'');
+    }else{
+      $('sync-action-result').textContent='Erro: '+(data.error||'');
+    }
+    loadSyncData();
+  }).catch(function(e){btn.textContent='Push para Hub';btn.disabled=false;$('sync-action-result').textContent='Erro: '+e.message});
+}
+
+function syncPull(force){
+  var btn=$('btn-sync-pull');
+  btn.textContent='Baixando...';btn.disabled=true;
+  $('sync-action-result').textContent='Pull em andamento...';
+  fetch('/api/sync/pull',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({force:!!force})})
+  .then(function(r){return r.json()})
+  .then(function(data){
+    btn.textContent='Pull do Hub';btn.disabled=false;
+    if(data.ok){
+      var d=data.data;
+      if(d.status==='empty'){$('sync-action-result').textContent=d.message;return;}
+      $('sync-action-result').innerHTML='<span style="color:#4ade80">Pull OK:</span> '+((d.pulled||[]).length+(d.new||[]).length)+' importados'+(d.conflicts&&d.conflicts.length?' | <span style="color:#f59e0b">'+d.conflicts.length+' conflitos</span>':'');
+    }else{
+      $('sync-action-result').textContent='Erro: '+(data.error||'');
+    }
+    loadSyncData();
+  }).catch(function(e){btn.textContent='Pull do Hub';btn.disabled=false;$('sync-action-result').textContent='Erro: '+e.message});
+}
+
 /* ── Init ── */
 load();
 loadNotes();
 loadUpdates();
 loadComparatorData();
+loadSyncData();
 setInterval(load,30000);
 </script>
 </body>

@@ -35,8 +35,8 @@
 - IA Comparator, AI Providers v3 (+ Groq, Ollama), fallback chain, rate limit, metricas por provider, dashboard comparacao, ranking
 
 ### v0.9: Auto-Update
-- Status: ⏳ Planejada
-- Propagacao de Kit Ouro entre projetos, sync automatico de padroes, versionamento cross-project
+- Status: ✅ Concluida
+- Kit Sync engine (lib/kit-sync.js), registry global (~/.gsd-ouro/), push/pull com deteccao de conflitos, diff por hash, dashboard tab Sync, 8 rotas API, 3 skill commands
 
 ### v1.0: Production
 - Status: 📋 Futura

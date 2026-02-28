@@ -1,5 +1,5 @@
 {
-  "version": "0.8.0",
+  "version": "0.9.0",
   "modo": "claude",
   "triggers": {
     "enabled": true,
@@ -13,7 +13,8 @@
     "chat": true,
     "notes": true,
     "updates": true,
-    "comparator": true
+    "comparator": true,
+    "sync": true
   },
   "comparator": {
     "enabled": true,

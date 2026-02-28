@@ -1,0 +1,14 @@
+[
+  {
+    "id": "cmp_mm5ye2zu_zh7y",
+    "timestamp": "2026-02-28T06:41:56.394Z",
+    "prompt_preview": "Explique em 3 linhas o que � o padr�o SOLID em programa��o",
+    "category": "geral",
+    "targets": 3,
+    "winner": {
+      "provider": "mistral",
+      "model": "codestral-latest",
+      "score": 55
+    }
+  }
+]

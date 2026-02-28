@@ -147,6 +147,18 @@ const getRoutes = {
   '/api/providers/metrics': () => {
     const aiProviders = require('../lib/ai-providers');
     return aiProviders.getMetrics();
+  },
+  '/api/sync/status': () => {
+    const sync = require('../lib/kit-sync');
+    return sync.status();
+  },
+  '/api/sync/projects': () => {
+    const sync = require('../lib/kit-sync');
+    return sync.listProjects();
+  },
+  '/api/sync/patterns': () => {
+    const sync = require('../lib/kit-sync');
+    return { local: sync.scanPatterns(), hub: sync.scanHub() };
   }
 };
 
@@ -217,6 +229,29 @@ const postRoutes = {
   '/api/providers/test': async () => {
     const aiProviders = require('../lib/ai-providers');
     return aiProviders.testAll();
+  },
+  '/api/sync/register': async (body) => {
+    const sync = require('../lib/kit-sync');
+    return sync.register(body.path);
+  },
+  '/api/sync/unregister': async (body) => {
+    const sync = require('../lib/kit-sync');
+    return sync.unregister(body.path);
+  },
+  '/api/sync/push': async (body) => {
+    const sync = require('../lib/kit-sync');
+    return sync.push({ force: body.force, files: body.files });
+  },
+  '/api/sync/pull': async (body) => {
+    const sync = require('../lib/kit-sync');
+    return sync.pull({ force: body.force, files: body.files, include_kit: body.include_kit });
+  },
+  '/api/sync/diff': async (body) => {
+    const sync = require('../lib/kit-sync');
+    if (body.file) return sync.fileDiff(body.file);
+    const local = sync.scanPatterns();
+    const hub = sync.scanHub();
+    return sync.diff(local, hub);
   }
 };
 
@@ -336,4 +371,14 @@ server.listen(PORT, () => {
   console.log('  /api/compare/recommendations  Recomendacoes por categoria');
   console.log('  /api/providers/available   Providers disponiveis');
   console.log('  /api/providers/metrics     Metricas de uso\n');
+  console.log('Kit Sync (GET):');
+  console.log('  /api/sync/status           Status sync cross-project');
+  console.log('  /api/sync/projects         Projetos registrados');
+  console.log('  /api/sync/patterns         Padroes local vs hub\n');
+  console.log('Kit Sync (POST):');
+  console.log('  /api/sync/register         Registrar projeto');
+  console.log('  /api/sync/unregister       Remover projeto');
+  console.log('  /api/sync/push             Exportar padroes para hub');
+  console.log('  /api/sync/pull             Importar padroes do hub');
+  console.log('  /api/sync/diff             Diff local vs hub\n');
 });

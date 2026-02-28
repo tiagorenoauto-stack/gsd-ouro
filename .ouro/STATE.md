@@ -2,15 +2,15 @@
 
 ## Sessao
 
-- Versao: 0.8.0 (Multi-IA + Score Comparison)
-- Fase atual: v0.8 concluida
-- Ultima tarefa: Popular arquivos .ouro/ com dados reais
-- Ultimo commit: dc98129
+- Versao: 0.9.0 (Auto-Update — Kit Sync)
+- Fase atual: v0.9 em andamento
+- Ultima tarefa: Kit Sync engine + dashboard tab + API routes + skill commands
+- Ultimo commit: pendente
 
 ## Progresso
 
-- Fases completas: 8 (v0.1 a v0.8)
-- Proxima fase: v0.9 (Auto-Update — Propagacao entre projetos)
+- Fases completas: 8 (v0.1 a v0.8), v0.9 em andamento
+- Proxima fase: v1.0 (Production — Estabilizacao)
 - Conformidade Kit: 15 padroes documentados em kit/padroes/
 
 ## Modulos Ativos
@@ -27,8 +27,9 @@
 | Update Control | lib/update-control.js | Ativo (v0.7+) |
 | AI Providers | lib/ai-providers.js | Ativo v3 (v0.8+) |
 | IA Comparator | lib/ia-comparator.js | Ativo (v0.8+) |
+| Kit Sync | lib/kit-sync.js | Ativo (v0.9+) |
 | Analytics | lib/analytics.js | Ativo (v0.1+) |
-| Dashboard | dashboard/index.html | 12 tabs (v0.8+) |
+| Dashboard | dashboard/index.html | 13 tabs (v0.9+) |
 
 ## Modo
 

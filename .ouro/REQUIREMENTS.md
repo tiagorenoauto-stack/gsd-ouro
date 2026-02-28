@@ -33,12 +33,15 @@
 - [x] Dashboard: tab Comparacao (targets, presets, side-by-side, ranking)
 - [x] 9 rotas API novas para comparacao e providers
 
-## Auto-Update (v0.9 — Planejado)
+## Auto-Update (v0.9 — Concluido)
 
-- [ ] Propagacao de Kit Ouro entre projetos
-- [ ] Sync automatico de padroes
-- [ ] Versionamento cross-project
-- [ ] Deteccao de divergencias entre instancias
+- [x] Kit Sync engine (lib/kit-sync.js): registro, push, pull, diff, status
+- [x] Registry global em ~/.gsd-ouro/ com hub de padroes
+- [x] Versionamento cross-project por hash MD5
+- [x] Deteccao de divergencias com diff detalhado
+- [x] Dashboard: tab Sync (status, diff, acoes, projetos)
+- [x] 8 rotas API (/api/sync/*)
+- [x] 3 skill commands (sync-push, sync-pull, sync-status)
 
 ## Fora de Escopo
 

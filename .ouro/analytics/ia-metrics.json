@@ -1,0 +1,66 @@
+{
+  "calls": [
+    {
+      "timestamp": "2026-02-28T06:41:51.151Z",
+      "provider": "groq",
+      "model": "llama-3.1-8b-instant",
+      "latency_ms": 729,
+      "tokens_in": 64,
+      "tokens_out": 103,
+      "success": true,
+      "prompt_length": 58
+    },
+    {
+      "timestamp": "2026-02-28T06:41:51.301Z",
+      "provider": "mistral",
+      "model": "codestral-latest",
+      "latency_ms": 879,
+      "tokens_in": 34,
+      "tokens_out": 107,
+      "success": true,
+      "prompt_length": 58
+    },
+    {
+      "timestamp": "2026-02-28T06:41:56.393Z",
+      "provider": "google",
+      "model": "gemini-2.5-flash",
+      "latency_ms": 5971,
+      "tokens_in": 18,
+      "tokens_out": 56,
+      "success": true,
+      "prompt_length": 58
+    }
+  ],
+  "providers": {
+    "groq:llama-3.1-8b-instant": {
+      "calls": 1,
+      "errors": 0,
+      "total_latency": 729,
+      "total_tokens_in": 64,
+      "total_tokens_out": 103,
+      "avg_latency": 729,
+      "error_rate": 0,
+      "last_used": "2026-02-28T06:41:51.151Z"
+    },
+    "mistral:codestral-latest": {
+      "calls": 1,
+      "errors": 0,
+      "total_latency": 879,
+      "total_tokens_in": 34,
+      "total_tokens_out": 107,
+      "avg_latency": 879,
+      "error_rate": 0,
+      "last_used": "2026-02-28T06:41:51.301Z"
+    },
+    "google:gemini-2.5-flash": {
+      "calls": 1,
+      "errors": 0,
+      "total_latency": 5971,
+      "total_tokens_in": 18,
+      "total_tokens_out": 56,
+      "avg_latency": 5971,
+      "error_rate": 0,
+      "last_used": "2026-02-28T06:41:56.393Z"
+    }
+  }
+}

@@ -16,6 +16,7 @@
 | Update Control | lib/update-control.js | v0.7 | Changelog, historico, version compare |
 | AI Providers | lib/ai-providers.js | v0.6 | Providers externos v3 (Groq, Ollama, metricas, fallback) |
 | IA Comparator | lib/ia-comparator.js | v0.8 | Compare paralelo, scoring, ranking, recomendacoes |
+| Kit Sync | lib/kit-sync.js | v0.9 | Sync cross-project, registry, push/pull, diff por hash |
 | Analytics | lib/analytics.js | v0.1 | Sessoes, tarefas, custos, metricas |
 
 ## Padroes de Codigo (kit/padroes/)

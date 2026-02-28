@@ -23,7 +23,7 @@ Desenvolvedor solo (Tiago) que usa Claude Code como assistente principal de dese
 
 - **GitHub:** tiagorenoauto-stack/gsd-ouro
 - **Branch:** main
-- **Versao:** 0.8.0 (Multi-IA)
+- **Versao:** 0.9.0 (Auto-Update)
 
 ## Estrutura
 
